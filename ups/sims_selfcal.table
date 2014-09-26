@@ -1,7 +1,7 @@
 # Note that scipy and numpy are both required for this package (scipy for some analysis). 
 # pgdb is required, but is not an LSST package unfortunately. 
-setupRequired(numpy >=1.5.1)
-setupRequired(scipy)
+setupRequired(numpy)
+#setupRequired(scipy) #Assumed part of anaconda
 setupOptional(matplotlib)
 #setupRequired(pgdb)
 setupRequired(swig)

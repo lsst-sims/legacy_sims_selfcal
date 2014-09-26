@@ -56,8 +56,8 @@ import healpy as hp
 from scipy import interpolate
 from scipy import stats
 #print 'importing clouds'
-import lsst.sims.selfcal.atmosphere.clouds.PowerSpectrum as pws
-import lsst.sims.selfcal.atmosphere.clouds.Clouds as cld
+import lsst.sims.selfcal.clouds.PowerSpectrum as pws
+import lsst.sims.selfcal.clouds.Clouds as cld
 
 import lsst.sims.maf.db as db
 
@@ -72,7 +72,9 @@ import lsst.sims.maf.db as db
 import lsst.sims.selfcal.analysis.useful_input as ui
 
 import lsst.sims.selfcal.generation.FocalplaneThermalModel as fpm
-import lsst.sims.selfcal.generation.ccs2amp_lib as cc
+
+# Need to fix this C-code to be able to import this
+# import lsst.sims.selfcal.generation.ccs2amp_lib as cc
 
 focalLength = 10300.0   # mm
 
