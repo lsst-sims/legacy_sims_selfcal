@@ -1,0 +1,1 @@
+grab my python solver from /astro/store/scratch/tmp/yoachim/Research/LSST/Parallel_Solver
