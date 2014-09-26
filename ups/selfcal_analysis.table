@@ -1,0 +1,10 @@
+# Note that scipy and numpy are both required for this package (scipy for some analysis). 
+# pgdb is required, but is not an LSST package unfortunately. 
+setupRequired(numpy >=1.5.1)
+setupRequired(scipy)
+setupOptional(matplotlib)
+#setupRequired(pgdb)
+
+envAppend(LD_LIBRARY_PATH, ${PRODUCT_DIR}/lib)
+envAppend(DYLD_LIBRARY_PATH, ${PRODUCT_DIR}/lib)
+envAppend(PYTHONPATH, ${PRODUCT_DIR}/python)

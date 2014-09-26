@@ -1,0 +1,41 @@
+# Note that scipy and numpy are both required for this package (scipy for some analysis). 
+# pgdb is required, but is not an LSST package unfortunately. 
+setupRequired(numpy >=1.5.1)
+setupRequired(scipy)
+setupOptional(matplotlib)
+#setupRequired(pgdb)
+setupRequired(swig)
+
+
+envSet(MODTRAN_EXECUTABLE, ${PRODUCT_DIR}/modtran/Mod90_5.2.1.exe)
+envSet(MODTRAN_DATADIR, ${PRODUCT_DIR}/modtran/DATA/)
+
+envAppend(LD_LIBRARY_PATH, ${PRODUCT_DIR}/lib)
+envAppend(DYLD_LIBRARY_PATH, ${PRODUCT_DIR}/lib)
+envAppend(PYTHONPATH, ${PRODUCT_DIR}/python)
+
+envSet(SELFCAL_DATA, ${PRODUCT_DIR}/data)
+
+envSet(LSST_CALSIM_HOSTNAME, "ivy.astro.washington.edu")
+envSet(LSST_CALSIM_USERNAME, "calibuser")
+envSet(LSST_CALSIM_PASSWORD, "calibuser")
+envSet(LSST_CALSIM_DATABASE, "calibDB.05.05.2010")
+envSet(LSST_CALSIM_DBTYPE, "postgres")
+
+#envSet(LSST_OPSIM_HOSTNAME, "lsst-db.astro.washington.edu")
+#envSet(LSST_OPSIM_USERNAME, "lsst")
+#envSet(LSST_OPSIM_PASSWORD, "lsst")
+#envSet(LSST_OPSIM_DATABASE, "opsimdev")
+#envSet(LSST_OPSIM_DBTYPE, "mysql")
+
+envSet(LSST_OPSIM_HOSTNAME, "ivy.astro.washington.edu")
+envSet(LSST_OPSIM_USERNAME, "calibuser")
+envSet(LSST_OPSIM_PASSWORD, "calibuser")
+envSet(LSST_OPSIM_DATABASE, "calibDB.05.05.2010")
+envSet(LSST_OPSIM_DBTYPE, "postgres")
+
+envSet(LSST_SELFCAL_HOSTNAME, "localhost")
+envSet(LSST_SELFCAL_USERNAME, "")
+envSet(LSST_SELFCAL_PASSWORD, "")
+envSet(LSST_SELFCAL_DATABASE, "calsim")
+envSet(LSST_SELFCAL_DBTYPE, "postgres")

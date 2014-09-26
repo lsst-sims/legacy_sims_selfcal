@@ -1,0 +1,134 @@
+# You can add comment lines with a hash at start
+# these are the parameters for the magnitudes of the sim stars
+
+#  the number of total stars in the sim
+    nStarTot = 1000000
+#  the magnitude range  
+    magmin = 17
+    magmax = 21
+#  the color (g-i) range of the sim stars
+    colmax = 3.5
+    colmin = -0.8
+#  A value for the random seed, if desired.
+    random_seed = 42
+#  Distribution to use for mag_rand_err.  Options:  Guassian, Cauchy
+    errorDist = Gaussian
+#  Systematic error --XXX currently not implamented, just use mag_rand_err
+    systematicErr = 0.004
+#  Parameters for using flux standard stars.  Flux standards are all placed on patchid 0.
+#  number of stars per block to use.  values < 1 make a fraction of the stars standards, values > 1 are the number of stars per block.
+    fluxFrac = 0
+#  Gaussian noise to add to the flux standard mags.
+    fluxNoise = 0.0001 
+#  the next few values are about the zeropoint and color terms
+#  the random error added to the stars, distribution set by errorDist.  This is an error floor.
+    mag_rand_err = 0.003
+#  calculate what LSST will think the error is based on observed mag (True) or output a 
+#  more realistic error (False)
+   calcerror = True
+#  the maximum zeropoint change added to the patches
+    zp_var_max = 1.0
+#  the maximum zeropoint gradient added to the patches
+    zp_grad_max = 0.0
+#  the maximum color term change in mag added to stars in a patch
+    colterm_max = 0
+#  the range between -1 < (g-i) < 1 in the color term due to filter bandpass shift.
+    colterm_rad_max =  -0.05
+#  the uncertainty in the observed color -- 0 or negative values will result in no color gradient correction
+    color_obs_noise = 0.05
+#  the fractional uncertainty in the color correction term ()
+    color_correction_error = 0.10
+#  fraction of the FoV that the filter can jitter 
+    filter_jitter = 0.00
+#  fractional variation in the gain (Gaussian RMS)
+    gainvar = 0.00
+#   fractional error in the exposure time (e.g., from shutter errors)
+    exptvar = 0.00
+#   number of HEALpixel sides to use.  Must be power of 2.
+    nside = 16
+#   size of the shift to apply when making healpix overlap--XXX-depreciated
+    healshift = 2.3
+#  Use the French cloud images.  Each visit has a cloud image generated on a sparse grid then linear interpolated to the star positions.    
+    use_cloudsimage = False
+    cloud_scale = 0.034
+#  the magnitude of the sinusoidal variation 
+#  in the zero point in the X and Y-directions.  Note, these 
+#  interfere with eachother so the total error 
+#  will be \pm (sinvarx_mag+sinvary_mag)
+    sinvarx_mag = 0.00
+    sinvary_mag = 0.00
+#  the spatial scale for the sinusoidal variation
+#  value of 1 will make the FOV run from -pi to pi, 2--> -2pi to 2pi
+    sinvarx_scale = 1.
+    sinvary_scale = 1.
+    sinx_phase = 0.0
+    siny_phase = 0.0
+#  angle between the x and y variation axes.  This is held constant.
+    sinx_angle = 20.0
+#  a second set of spatially varying sinusoidal errors.  
+#  Here, the phase is randomly set for each night to simulate flat fielding errors
+    flat_sinvarx_mag = 0.00
+    flat_sinvary_mag = 0.00
+    flat_sinvarx_scale = 1.
+    flat_sinvary_scale = 1.
+#  angle between x and y axes.  Held constant, but the phase is varied from night-to-night
+    flat_sinx_angle = 0.0
+#  how many nights to keep the phase constant
+    phase_persist = 1
+# spatial variation from cloud removal
+#   fraction of the total zeropoint shift to put in as the cloud magnitude
+    cloud_mag = 0.00
+    cloud_sinvar_scale = 5.
+# Variable star contamination
+    rr_fraction = 0
+    rr_amplitude = 1.
+# Use Kepler stellar variability statistics?
+    kepler_variablity = False
+# limits for sim footprint
+#  the ra/dec limits, in degrees
+    raMin = 0
+    raMax = 30.
+    decMin = -40.
+    decMax = 0.
+# you can use opsim (True or False) to generate fields    
+#  use opsim database (opsim3.61)
+    use_opsim = True
+# flag to use the opsim dither scheme, instead of random dither.
+# note that opsim dither scheme covers the entire radius_fov (i.e. dith_Offset_frac = 1)
+    use_opsimdither = True
+# opsim filter, if using this
+    opsimfilter = r
+#  then specify time to start/stop, in nights from start of opsim
+    tstart = 0
+    tstop = 730
+# or don't use opsim and specify nEpoch instead
+#  nepoch = number of visits to each field
+    nEpoch = 10
+# you can use calsim database to generate the stars.  Available calsimtables include:  "msrgb", "msrgb_1e6", and "msrgb_1e7".  "msrgb" has a full galfast simulation down to r~21.2.  The other two are subsets of msrgb with fairly uniform stellar density on the sky.  
+    use_calsim = True
+    calsimtable = "msrgb_1e6"
+# you can also change the radius of the field of view
+    radius_fov = 1.8
+# and the number of patches to split this radius into .. should be 'square' (nPatch=N^2)
+    nPatch = 25
+# raOff and decOff control dithering
+    dith_raOff_frac = 0.5
+    dith_decOff_frac = 0.5
+# Limits of camera rotation, in degrees (has a dithering effect) (LSST standard = -90 to 90)
+    dith_skyRot_min = -90
+    dith_skyRot_max = 90
+# filenames for outputs
+#  starobs is the file input to the solver
+    starobs_filename = star_obs.dat
+# should starobs contain the subpatch information?  These can then be solved for illumination corrections.
+    print_subpatch = False
+# if using subpatches, how many?  Should be "square" and greater than nPatches.  Beware degeneracies between nillum_patch and nPatch.
+    nillum_patch = 36
+#  master file contains everything relevant to every measurement of every star
+    master_filename = /dev/null
+#  stardata is the basic star magnitudes, positions and colors
+    stardata_filename = stardata.dat
+#  visitdata gives the information on the visits used in the simulation
+    visit_filename = visit.dat
+#  patchdata gives the information on the patches in the simulation 
+    patch_filename = patchdata.dat 

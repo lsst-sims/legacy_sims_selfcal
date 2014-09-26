@@ -1,0 +1,11 @@
+Migrating code from old cgit repo to Stash, 9/25/14.
+
+Due to large data files in the old repos, I'm pruning this down and tossing the file histories.  For the histories, go see the original repos at:
+LSST/sims/selfcal/analysis.git	
+LSST/sims/selfcal/generation.git
+LSST/sims/atmosphere/clouds.git	
+LSST/sims/atmosphere/transmission.git
+
+I'm not pulling over the giant papers found here:
+LSST/sims/doc.git
+

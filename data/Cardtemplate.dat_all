@@ -1,0 +1,38 @@
+CARD1: MODTRN, SPEED, BINARY, LYMOLC,// MODEL,// T_BEST,// ITYPE, IEMSCT, IMULT, M1, M2, M3, M4, M5, M6, MDEF, I_RD2C,// NOPRNT,// TPTEMP,// SURREF
+FORMAT (4A1, I1, 11I5, 1X, I4, F8.0, A7)
+MMF 3    3    0    0    0    0    0    0    0    0    0    0    3
+
+CARD 1A: DIS, DISAZM, DISALB,// NSTR,// SFWHM,// CO2MX,// H2OSTR, O3STR, // C_PROF, (LSUNFL),// LBMNAM, LFLTNM, H2OAER, CDTDIR,// SOLCON, CDASTM, ASTMC, ASTMX, ASTMO, AERRH, NSSALB
+FORMAT(3A1, I3, F4.0, F10.0, 2A10, 2A1, 4(1X, A1), F10.0, A1, F9.0, 3F10.0, I10)
+s   8    0   360.000   1.00000   1.00000 F F F F T 
+
+CARD 1A4: DATDIR
+FORMAT (A256)  (only looked for because of indication of data directory above)                                  
+${MODTRAN_DATADIR}
+
+CARD2: APLUS,// IHAZE,// CNOVAM,// ISEASN,// ARUSS, IVULCN, ICSTL, ICLD, IVSA, VIS, WSS, WHH, RAINRT, GNDALT
+FORMAT (A2, I3, A1, I4, A3, I2, 3I5, 5F10.5)
+
+A+  0    0    0    0    0    0   0.00000   0.00000   0.00000   0.00000   1.50000
+
+CARD 2A+: ZAER11, ZAER12, SCALE1, ZAER21, ZAER22, SCALE2, ZAER31, ZAER32, SCALE3, ZAER41, ZAER42, SCALE4 (If APLUS = 'A+')
+FORMAT ((3(1X, F9.0), 20X, 3(1X, F9.0)))
+        0.        3.        1.                            2.       11.        1.
+       10.       35.        1.                           30.      100.        1.
+
+CARD 2A & 2B go here (inserted by code)
+
+
+CARD 3: H1, H2, ANGLE, RANGE, BETA, RO,// LENN,// // PHI 
+FORMAT (6F10.0, I5, 5X, 2F10.0)
+ 002.88000                  1.    (Tim)                               
+     2.200     0.000     0.000     0.000     0.000     0.000    0          0.000 (Michel)
+
+Card4: V1, V2, DV, FWHM,// YFLAG, XFLAG,// DLIMIT,// FLAGS, //MLFLX,// VRFRAC 
+FORMAT (4F10.0, 2A1, A8, A7, I3, F10.0) 
+     290.0    1100.0      0.50      1.00TN       $NGAA                        (Michel)
+       300      1100         1         1TN $      NGAA (Tim .. modified)
+
+
+
+    0                                                                           

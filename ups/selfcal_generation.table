@@ -1,0 +1,39 @@
+# scipy and numpy are required (scipy for clouds, numpy for other)
+# but using the stack numpy means a version which is <1.4.1 so scipy will
+#  break.   When scipy is in the stack, a setup scipy and setup numpy would be appropriate.
+setupRequired(numpy > 1.5.1 )
+setupRequired(mysqlpython > 1.2.2)
+
+setupRequired(atmosphere_clouds)
+setupRequired(selfcal_analysis)
+setupRequired(swig)
+
+envAppend(LD_LIBRARY_PATH, ${PRODUCT_DIR}/lib)
+envAppend(DYLD_LIBRARY_PATH, ${PRODUCT_DIR}/lib)
+envAppend(PYTHONPATH, ${PRODUCT_DIR}/python)
+
+envSet(SELFCAL_DATA, ${PRODUCT_DIR}/data)
+
+envSet(LSST_CALSIM_HOSTNAME, "ivy.astro.washington.edu")
+envSet(LSST_CALSIM_USERNAME, "calibuser")
+envSet(LSST_CALSIM_PASSWORD, "calibuser")
+envSet(LSST_CALSIM_DATABASE, "calibDB.05.05.2010")
+envSet(LSST_CALSIM_DBTYPE, "postgres")
+
+#envSet(LSST_OPSIM_HOSTNAME, "lsst-db.astro.washington.edu")
+#envSet(LSST_OPSIM_USERNAME, "lsst")
+#envSet(LSST_OPSIM_PASSWORD, "lsst")
+#envSet(LSST_OPSIM_DATABASE, "opsimdev")
+#envSet(LSST_OPSIM_DBTYPE, "mysql")
+
+envSet(LSST_OPSIM_HOSTNAME, "ivy.astro.washington.edu")
+envSet(LSST_OPSIM_USERNAME, "calibuser")
+envSet(LSST_OPSIM_PASSWORD, "calibuser")
+envSet(LSST_OPSIM_DATABASE, "calibDB.05.05.2010")
+envSet(LSST_OPSIM_DBTYPE, "postgres")
+
+envSet(LSST_SELFCAL_HOSTNAME, "localhost")
+envSet(LSST_SELFCAL_USERNAME, "")
+envSet(LSST_SELFCAL_PASSWORD, "")
+envSet(LSST_SELFCAL_DATABASE, "calsim")
+envSet(LSST_SELFCAL_DBTYPE, "postgres")

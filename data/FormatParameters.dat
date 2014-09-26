@@ -1,0 +1,17 @@
+ZANGLE 7  %10.3f 21 30 
+MODEL  0  %3d     3  5 
+CO2    1  %10.3f 11 20 
+H2O    1  %10.3f 21 30 
+O3     1  %10.3f 31 40 
+IHAZE  4  %3d     3  5 
+ISEAS  4  %4d     7 10 
+IVULC  4  %2d    14 15 
+ICLD   4  %5d    21 25 
+IVSA   4  %5d    26 30 
+VIS    4  %10.5f 31 40 
+ZAER11 5  %9.0f   2 10 
+ZAER12 5  %9.0f  12 20 
+ZAER21 5  %9.0f  52 60 
+ZAER22 5  %9.0f  62 70 
+SCALE1 5  %9.0f  22 30 
+SCALE2 5  %9.0f  72 80 

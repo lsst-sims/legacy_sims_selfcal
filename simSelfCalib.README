@@ -1,0 +1,25 @@
+Quick file list: 
+
+# a sample input file for simSelfCalib.py 
+simSelfCalib.input
+
+# program to generate sim calibrate-able data
+simSelfCalib.py 
+( run as 'python simSelfCalib.py simSelfCalib.input')
+# then you would run Nikhil's solver with 
+( run as '../selfcalib/simple.x star_obs.dat test 1.e-7 10000' or similar )
+# my simple program to start looking at the output
+simSelfCalib_testoutput.py
+( run as 'python simSelfCalib_testoutput.py simSelfCalib_testoutput.input')
+# you can also use Zeljko's SM macros in the ZIsims directory
+
+
+# my output files from simSelfCalib.py  
+master_cal.dat
+patch_info.dat
+stardata.dat
+star_obs.dat  *** this is the one for Nikhil's program to input. "simple.x star_obs.dat test 1e-7 10000", for example
+
+
+
+
