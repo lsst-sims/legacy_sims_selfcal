@@ -758,7 +758,8 @@ def readParameters(parameter_filename):
 
 
 def getVisits_db(ra_min, ra_max, dec_min, dec_max, time_start, time_stop, opsimfilter, 
-                 rad_fov_deg, use_opsimdither, dith_raOff_frac, dith_decOff_frac, random_seed):
+                 rad_fov_deg, use_opsimdither, dith_raOff_frac, dith_decOff_frac, random_seed,
+                 visitAddress='sqlite:///opsimblitz2_1060_sqlite.db'):
     """Get visits by querying opsim database. 
     
     Return all visits falling within ra/dec boundary, within given time.
@@ -766,8 +767,8 @@ def getVisits_db(ra_min, ra_max, dec_min, dec_max, time_start, time_stop, opsimf
       dith_raOff_frac, dith_decOff_frac.
       Time_start/stop is in days (since start of survey), ra/dec in degrees. """
     # Connect to the database.
-    conn, cursor = ui.sqlConnect(hostname=opsimhostname, username= opsimusername, passwdname = opsimpassword, 
-                                 dbname=opsimdb, dbtype=opsimdbtype)
+    #conn, cursor = ui.sqlConnect(hostname=opsimhostname, username= opsimusername, passwdname = opsimpassword, 
+    #                             dbname=opsimdb, dbtype=opsimdbtype)
     # Opsim uses radians for field locations, so convert and add buffer (fudge factor) for radius of
     #  field of view because want to include fields which may fall partly within this boundary. 
     # This buffer here includes a sqrt2 because I only want to include fields which have the inscribed
@@ -791,43 +792,46 @@ def getVisits_db(ra_min, ra_max, dec_min, dec_max, time_start, time_stop, opsimf
         ramax=360
     ramin = ramin*deg2rad
     ramax = ramax*deg2rad
-    print "Querying for fields from %s with ra between %f and %f, dec between %f and %f" \
-              %(opsimtable, ramin*rad2deg, ramax*rad2deg, decmin*rad2deg, decmax*rad2deg)
     if use_opsimdither:
-        sqlquery = 'select DISTINCT ON (expmjd) hexdithra, hexdithdec, rotSkyPos, night, expmjd, "5sigma_modified" from %s' %(opsimtable)
+        cols = ['ditheredRA', 'ditheredDec', 'rotSkyPos', 'night', 'expMJD',  'fiveSigmaDepth']
     else:
-        sqlquery = 'select DISTINCT ON (expmjd) fieldra, fielddec, rotSkyPos, night, expmjd, "5sigma_modified" from %s' %(opsimtable)
+        cols = ['fieldRA', 'fieldDec', 'rotSkyPos', 'night', 'expMJD',  'fiveSigmaDepth']
     # declination is in order from -90 to 90
-    sqlquery = sqlquery + " where (fielddec between %f and %f)" %(decmin, decmax)
+    sqlwhere =  "(fielddec between %f and %f)" %(decmin, decmax)
     # ra might wrap around RA = 0 though
     if (ramin<ramax):
-        sqlquery = sqlquery + " and (fieldRA between %f and %f)" % (ramin, ramax)
+        sqlwhere = sqlwhere + " and (fieldRA between %f and %f)" % (ramin, ramax)
     else: 
-        sqlquery = sqlquery + " and ((fieldRA>%f) or (fieldRA<%f))" %(ramin, ramax)
-    sqlquery = sqlquery + " and (night between %f and %f)" % (time_start, time_stop)
+        sqlwhere = sqlwhere + " and ((fieldRA>%f) or (fieldRA<%f))" %(ramin, ramax)
+    sqlwhere = sqlwhere + " and (night between %f and %f)" % (time_start, time_stop)
 #    sqlquery = sqlquery + " and filter='%s' group by expmjd order by min(expmjd)" %(opsimfilter)
-    sqlquery = sqlquery + " and filter='%s'  " %(opsimfilter)
-    print "# ", sqlquery
+    sqlwhere = sqlwhere + " and filter='%s'  " %(opsimfilter)
+    print "# ", sqlwhere
     # Get Query results.
-    sqlresults = ui.sqlQuery(cursor, sqlquery)
+    opsimDB = db.OpsimDatabase(visitAddress)
+    sqlresults = opsimDB.fetchMetricData(cols, sqlwhere)
+    visits = sqlresults
+    visits.dtype.names = ('id', 'ra', 'dec', 'skyrot', 'night', 'time', 'fiveSigmaDepth')
+    
+    
     print "Fetched %d potential fields from database" %(len(sqlresults))
-    ui.sqlEndConnect(conn, cursor)
+    #ui.sqlEndConnect(conn, cursor)
     # Assign query results to appropriate fields in dictionary.
-    visits = {}
-    keys = ('ra', 'dec', 'skyrot', 'night', 'time', '5sigma_modified')
-    arraylen = len(sqlresults)
-    if (arraylen==0):
-        raise Exception("Found no observations matching these constraints.")
-    dtypes = ['float' ,'float' ,'float' ,'float', 'float','float' ,'int' ]
-    for i in np.arange(np.size(keys)):
-        visits[keys[i]] = np.empty((arraylen,), dtype=dtypes[i])
-    i = 0
-    for result in sqlresults: 
-        j = 0  
-        for key in keys:
-            visits[key][i] = result[j]
-            j = j+1
-        i = i+1
+#    visits = {}
+#    keys = ('ra', 'dec', 'skyrot', 'night', 'time', 'fiveSigmaDepth')
+#    arraylen = len(sqlresults)
+#    if (arraylen==0):
+#        raise Exception("Found no observations matching these constraints.")
+#    dtypes = ['float' ,'float' ,'float' ,'float', 'float','float' ,'int' ]
+#    for i in np.arange(np.size(keys)):
+#        visits[keys[i]] = np.empty((arraylen,), dtype=dtypes[i])
+#    i = 0
+#    for result in sqlresults: 
+#        j = 0  
+#        for key in keys:
+#            visits[key][i] = result[j]
+#            j = j+1
+#        i = i+1
     # Convert RA/dec back to degrees.
     visits['ra'] = visits['ra'] * rad2deg
     visits['dec'] = visits['dec'] * rad2deg    
@@ -863,12 +867,15 @@ def getVisits_db(ra_min, ra_max, dec_min, dec_max, time_start, time_stop, opsimf
                       (visits['ra'] <= ramax + rad_fov_deg/np.cos(visits['dec']*deg2rad)/sqrt2)) &
                      (visits['dec'] >= decmin - rad_fov_deg/sqrt2) &
                      (visits['dec'] <= decmax + rad_fov_deg/sqrt2))
-    visits['ra'] = visits['ra'][condition]
-    visits['dec'] = visits['dec'][condition]
-    visits['time'] = visits['time'][condition]
-    visits['skyrot'] = visits['skyrot'][condition]
-    visits['night'] = visits['night'][condition]
-    visits['5sigma_modified']=visits['5sigma_modified'][condition]
+    
+    visits = visits[condition]
+    
+    #visits['ra'] = visits['ra'][condition]
+    #visits['dec'] = visits['dec'][condition]
+    #visits['time'] = visits['time'][condition]
+    #visits['skyrot'] = visits['skyrot'][condition]
+    #visits['night'] = visits['night'][condition]
+    #visits['fiveSigmaDepth']=visits['fiveSigmaDepth'][condition]
     nvisits = len(visits['ra'])
     visits['id'] = np.arange(0, nvisits, 1, dtype='int')
     print "Got %d visits from the opsim over the desired RA/Dec and time range" %(nvisits)
@@ -975,10 +982,10 @@ def generateVisits(ra_min, ra_max,  dec_min, dec_max, nepochs, rad_fov_deg,
     visits['id'] = visits['id'][condition]
     nvisits = len(visits['ra'])
     visits['id'] = np.arange(0, nvisits, 1, dtype='int')
-    #need to add in 'night' and '5sigma_modified' parameters to keep things compatible
+    #need to add in 'night' and 'fiveSigmaDepth' parameters to keep things compatible
     visits['night']=np.round(visits['time'])
     visits['night']=visits['night']-np.min(visits['night'])
-    visits['5sigma_modified']=visits['time']*0+24.6826 #just use an average r-band depth
+    visits['fiveSigmaDepth']=visits['time']*0+24.6826 #just use an average r-band depth
     print "Generated %d visits from the opsim over the desired RA/Dec and time range" %(nvisits)
     return visits
 
@@ -1298,7 +1305,7 @@ def generateStarMags(visits, ra_min, ra_max, dec_min, dec_max, mag_min, mag_max,
     for visitN in range(0, len(blockvisits['ra'])):
         raCen =  blockvisits['ra'][visitN]
         decCen = blockvisits['dec'][visitN]
-        m5 = blockvisits['5sigma_modified'][visitN]
+        m5 = blockvisits['fiveSigmaDepth'][visitN]
         # Calculate the angular distances of each star from the center of the field of view.
         starDist = rad2deg * calcDist_cosines(raCen*deg2rad, decCen*deg2rad, 
                                               stars['ra']*deg2rad, stars['dec']*deg2rad)
