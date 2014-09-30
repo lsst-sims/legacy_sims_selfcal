@@ -28,6 +28,7 @@ def genCatalog(visits, starsDbAddress, offsets=None, lsstFilter='r', raBlockSize
     # Loop over the sky
     raBlocks = np.arange(0.,2.*np.pi, np.radians(raBlockSize))
     decBlocks = np.arange(np.pi, -np.pi, np.radians(decBlockSize) )
+    
     for raBlock in raBlocks:
         for decBlock in decBlocks:
             np.random.seed(seed)
@@ -38,6 +39,9 @@ def genCatalog(visits, starsDbAddress, offsets=None, lsstFilter='r', raBlockSize
                       visits['dec'] < decBlock+decBlockSize))
             if np.size(visitsIn) > 0:
                 # Fetch the stars in this block+the radiusFoV
+                decPad = radiusFoV
+                raPad = radiusFoV # can cut this down a bit
+                # Need to deal with wrap around effects.
                 sqlwhere = 'ra >=  '
                 stars = msrgbDB.tables['stars'].query_columns_Array(
                     colnames=starCols, constraint=sqlwhere)
@@ -57,5 +61,14 @@ def genCatalog(visits, starsDbAddress, offsets=None, lsstFilter='r', raBlockSize
                     starsIn = offset.run(starsIn, visit)
                 # XXX--print the stars in to a file
                 # patchID, starID, observed Mag, mag uncertainty, radius, healpixIDs
+
+                # Note the new starID's and print those to a truth file
+                # starID true mag
+
+                # Calc and print a patch file.  Note this is slightly ambiguous since the clouds can have structure
+                # patchID magOffset
+
+                # Look at the distribution of dmags
+                # patchID, starID, dmag1, dmag2, dmag3...
                 
     
