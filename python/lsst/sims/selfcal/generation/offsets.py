@@ -10,6 +10,16 @@ class BaseOffset(object):
     def run(self, stars, visit):
         pass
 
+
+class NoOffset(BaseOffset):
+    def __init__(self):
+        """ Make no changes to the mags """
+        self.newkey = 'dmag_zero'
+    def run(self, stars,visits):
+        dmag = np.zeros(stars.size, dtype=zip([self.newkey],[float]))
+        stars = rfn.merge_arrays( [ stars, dmag], flatten=True, usemask=False)
+        return stars    
+
 class OffsetSys(BaseOffset):
     def __init__(self, error_sys=0.003):
         """Systematic error floor for photometry"""

@@ -1,7 +1,17 @@
 import numpy as np
 import lsst.sims.maf.db as db
 
+def wrapRA(ra):
+    """Wraps RA into 0-360 degrees."""
+    ra = ra % 360.0
+    return ra
 
+def capDec(dec):
+    """Terminates declination at +/- 90 degrees."""
+    dec = np.where(dec>90, 90, dec)
+    dec = np.where(dec<-90, -90, dec)
+    return dec
+  
 
 def genCatalog(visits, starsDbAddress, offsets=None, lsstFilter='r', raBlockSize=20., decBlockSize=10,
                nPatches=16, radiusFoV=1.8, verbose=True, seed=42):
@@ -40,9 +50,27 @@ def genCatalog(visits, starsDbAddress, offsets=None, lsstFilter='r', raBlockSize
             if np.size(visitsIn) > 0:
                 # Fetch the stars in this block+the radiusFoV
                 decPad = radiusFoV
-                raPad = radiusFoV # can cut this down a bit
+                raPad = radiusFoV 
                 # Need to deal with wrap around effects.
-                sqlwhere = 'ra >=  '
+                decMin = capDec(decBlock-decPad)
+                decMax = capDec(decBlock+decBlockSize+decPad)
+                sqlwhere = 'decl > decMin and decl < decMax '
+                raMin = raBlock-raPad/np.cos(np.radians(decMin))
+                raMax = raBlock+raBlockSize+raPad/np.cos(np.radians(decMin))
+
+                if wrapRA(raMin) != raMin & wrapRA(raMax) != raMax:
+                    # near a pole, just grab all the stars
+                    sqlwhere += '' 
+                else:
+                    raMin = wrapRA(raMin)
+                    raMax = wrapRA(raMax)
+                    # no wrap
+                    if raMin < raMax:
+                        slqwhere += 'and ra < raMax and ra > raMin '
+                    # One side wrapped
+                    else:
+                        sqlwhere += 'and (ra > raMin or ra < raMax)'
+
                 stars = msrgbDB.tables['stars'].query_columns_Array(
                     colnames=starCols, constraint=sqlwhere)
                 # Add any interesting columns, maybe primary healpix id and hpid 1-4
