@@ -4,7 +4,7 @@ import lsst.sims.maf.db as db
 
 
 def genCatalog(visits, starsDbAddress, offsets=None, lsstFilter='r', raBlockSize=20., decBlockSize=10,
-               nPatches=16, radiusFoV=1.8, verbose=True):
+               nPatches=16, radiusFoV=1.8, verbose=True, seed=42):
     """
     Generate a catalog of observed stellar magnitudes.
 
@@ -20,7 +20,7 @@ def genCatalog(visits, starsDbAddress, offsets=None, lsstFilter='r', raBlockSize
         return
 
     # Set up connection to stars db:
-    msrgbDB = db.Database(dbadd, dbTables={'stars':['stars', 'simobjid']})
+    msrgbDB = db.Database(starsDbAddress, dbTables={'stars':['stars', 'id']})
     starCols = ['id', 'rmag', 'gmag']
     if lsstFilter+'mag' not in starCols:
         starCols.append(lsstFilter+'mag' )
@@ -30,6 +30,8 @@ def genCatalog(visits, starsDbAddress, offsets=None, lsstFilter='r', raBlockSize
     decBlocks = np.arange(np.pi, -np.pi, np.radians(decBlockSize) )
     for raBlock in raBlocks:
         for decBlock in decBlocks:
+            np.random.seed(seed)
+            seed += 1 #This should make it possible to run in parallel and maintain repeatability.
             visitsIn = visits(np.where( visits['ra'] >=
                       raBlock & visits['ra'] < raBlock+raBlockSize &
                       visits['dec'] >=  decBlock &
@@ -42,7 +44,7 @@ def genCatalog(visits, starsDbAddress, offsets=None, lsstFilter='r', raBlockSize
                 # Add any interesting columns, maybe primary healpix id and hpid 1-4
             for visit in visitsIn:
                 # Calc x,y, radius for each star, crop off stars outside the FoV
-                # XXX - plan to replace with code to see where each star falls
+                # XXX - plan to replace with code to see where each star falls and get chipID, etc
                 starsIn = starsProject(starsIn, visit)
                 starsIn = starsIn[np.where(starsIn['radius'] <= np.radians(radiusFoV))]
 
