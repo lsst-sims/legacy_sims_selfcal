@@ -11,6 +11,8 @@ def visitOffsets(visits, zpOff=1.):
     dnames = visits.dtype.names
     dnames = ['ra' if (x=='fieldRA' or x=='ditheredRA') else x for x in dnames]
     dnames = ['dec' if (x=='fieldDec' or x=='ditheredDec') else x for x in dnames]
+    dnames = ['visitID' if (x=='obsHistID') else x for x in dnames]
+    
     visits.dtype.names = dnames
     
     zp = (np.random.uniform(size=visits.size)*zpOff).astype(zip(['zpOff'],[float]))
