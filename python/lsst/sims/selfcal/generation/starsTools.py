@@ -18,15 +18,9 @@ def starsProject(stars, visit):
     """
     names=['x','y','radius']
     types=[float,float,float]
-
-    xyr=np.zeros(stars.size, dtype=zip(names,types))
-    # XXX -- should I just make sure everything is radians to start with?
-    xyr['x'], xyr['y'] = gnomonic_project_toxy(np.radians(stars['ra']),np.radians(stars['decl']),
+    stars['x'], stars['y'] = gnomonic_project_toxy(np.radians(stars['ra']),np.radians(stars['decl']),
                                                visit['ra'], visit['dec'])
-    xyr['radius'] = (xyr['x']**2+xyr['y']**2)**0.5
-    
-    stars =  rfn.merge_arrays([stars, xyr],  flatten=True, usemask=False)
-
+    stars['radius'] = (stars['x']**2+stars['y']**2)**0.5
     return stars
 
 def assignPatches(stars, visit, nPatches=16, radiusFoV=1.8):
@@ -36,12 +30,10 @@ def assignPatches(stars, visit, nPatches=16, radiusFoV=1.8):
     maxx, maxy =  gnomonic_project_toxy(0., np.radians(radiusFoV), 0., 0.)
     nsides = nPatches**0.5
     
-    # This should move all coords to  0 < x < nsides
+    # This should move all coords to  0 < x < nsides-1
     px = np.floor((stars['x'] + maxy)/(2.*maxy)*nsides)
     py = np.floor((stars['y'] + maxy)/(2.*maxy)*nsides)
-
-    patchID = np.zeros(stars.size, dtype=zip(['patchID', 'subPatch'],[int,int]))
-    patchID['subPatch'] = px + py*nsides 
-    patchID['patchID'] = patchID['subPatch'] + visit['visitID']*nPatches
-    stars =  rfn.merge_arrays([stars, patchID],  flatten=True, usemask=False)
+    
+    stars['subPatch'] = px + py*nsides 
+    stars['patchID'] = stars['subPatch'] + visit['visitID']*nPatches
     return stars

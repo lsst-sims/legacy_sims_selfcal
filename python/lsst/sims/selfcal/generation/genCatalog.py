@@ -1,6 +1,7 @@
 import numpy as np
 import lsst.sims.maf.db as db
 from lsst.sims.selfcal.generation.starsTools import starsProject, assignPatches
+import numpy.lib.recfunctions as rfn
 
 def wrapRA(ra):
     """Wraps RA into 0-360 degrees."""
@@ -51,11 +52,11 @@ def genCatalog(visits, starsDbAddress, offsets=None, lsstFilter='r', raBlockSize
     # List to keep track of which starIDs have been written to truth file
     idsUsed = []
     nObs = 0
-
     
     for raBlock in raBlocks:
         for decBlock in decBlocks:
-            
+            # The idea here is that this could be run in parallel or not and is still repeatable
+            # b/c the seed will always be the same for each block.
             np.random.seed(seed)
             seed += 1 #This should make it possible to run in parallel and maintain repeatability.
             visitsIn = visits[np.where( (visits['ra'] >=
@@ -90,7 +91,12 @@ def genCatalog(visits, starsDbAddress, offsets=None, lsstFilter='r', raBlockSize
                     colnames=starCols, constraint=sqlwhere)
                 print 'got %i stars'%stars.size
                 # XXX -- add all the columns I will want here, then I only do
-                # one numpy stack per block rather than lots of stacks per visit!
+                # one numpy stack per block rather than lots of stacks per visit
+                # Ugh, feels like writing fortran though...
+                newcols = ['x', 'y', 'radius', 'patchID', 'subPatch', 'hpID']
+                newtypes = [float, float, float, int,int, int]
+                stars = rfn.merge_arrays([stars, np.zeros(stars.size, dtype=zip(newcols,newtypes))],
+                                         flatten=True, usemask=False)
                 
                 # Add any interesting columns, maybe primary healpix id and hpid 1-4
             for visit in visitsIn:
@@ -125,6 +131,7 @@ def genCatalog(visits, starsDbAddress, offsets=None, lsstFilter='r', raBlockSize
 
                 # Note the new starID's and print those to a truth file
                 # starID true mag
+                # XXX--might be better to just collect these and print at the end so that they can be sorted?
                 for ID,mag in zip(starsIn['id'][newIDs],starsIn['%smag'%lsstFilter][newIDs]):
                     print >>tfile, '%i, %f'%(ID, mag)
 
