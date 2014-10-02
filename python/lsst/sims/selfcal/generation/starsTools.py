@@ -16,15 +16,15 @@ def starsProject(stars, visit):
     """
     Project the stars to x,y plane for a given visit.
     """
-    print 'ackack', stars.size
     names=['x','y','radius']
     types=[float,float,float]
 
     xyr=np.zeros(stars.size, dtype=zip(names,types))
     # XXX -- should I just make sure everything is radians to start with?
-    xyr['x'],xyr['y'] = gnomonic_project_toxy(stars['ra'],stars['dec'], visit['ra'], visit['dec'])
-    xyr['r'] = (x**2+y**2)**0.5
-
+    xyr['x'], xyr['y'] = gnomonic_project_toxy(np.radians(stars['ra']),np.radians(stars['decl']),
+                                               visit['ra'], visit['dec'])
+    xyr['radius'] = (xyr['x']**2+xyr['y']**2)**0.5
+    
     stars =  rfn.merge_arrays([stars, xyr],  flatten=True, usemask=False)
 
     return stars
@@ -33,17 +33,15 @@ def assignPatches(stars, visit, nPatches=16, radiusFoV=1.8):
     """
     Assign PatchIDs to everything.  Assume that stars have already been projected to x,y
     """
-    maxval =  gnomonic_project_toxy(0., np.radians(radiusFoV), 0., 0.)
-
-    # This should move all coords to  0 < x < 2.xmaxval
-    x = stars['x'] + maxval
-    y = stars['y'] + maxval
-
+    maxx, maxy =  gnomonic_project_toxy(0., np.radians(radiusFoV), 0., 0.)
     nsides = nPatches**0.5
-    px = np.floor(x/nsides)
-    py = np.floor(y/nsides)
+    
+    # This should move all coords to  0 < x < nsides
+    px = np.floor((stars['x'] + maxy)/(2.*maxy)*nsides)
+    py = np.floor((stars['y'] + maxy)/(2.*maxy)*nsides)
 
-    patchID = np.zeros(stars.size, dtype=zip(['patchID'],[int]))
-    patchID += px + py*nsides + visit['visitID']*nPatches
+    patchID = np.zeros(stars.size, dtype=zip(['patchID', 'subPatch'],[int,int]))
+    patchID['subPatch'] = px + py*nsides 
+    patchID['patchID'] = patchID['subPatch'] + visit['visitID']*nPatches
     stars =  rfn.merge_arrays([stars, patchID],  flatten=True, usemask=False)
     return stars

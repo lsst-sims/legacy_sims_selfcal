@@ -40,7 +40,7 @@ def genCatalog(visits, starsDbAddress, offsets=None, lsstFilter='r', raBlockSize
     
     # Set up connection to stars db:
     msrgbDB = db.Database(starsDbAddress, dbTables={'stars':['stars', 'id']})
-    starCols = ['id', 'rmag', 'gmag']
+    starCols = ['id', 'rmag', 'gmag', 'ra', 'decl']
     if lsstFilter+'mag' not in starCols:
         starCols.append(lsstFilter+'mag' )
 
@@ -52,7 +52,6 @@ def genCatalog(visits, starsDbAddress, offsets=None, lsstFilter='r', raBlockSize
     idsUsed = []
     nObs = 0
 
-    
     
     for raBlock in raBlocks:
         for decBlock in decBlocks:
@@ -73,7 +72,7 @@ def genCatalog(visits, starsDbAddress, offsets=None, lsstFilter='r', raBlockSize
                 sqlwhere = 'decl > %f and decl < %f '%(decMin, decMax)
                 raMin = np.degrees(raBlock)-raPad/np.cos(np.radians(decMin))
                 raMax = np.degrees(raBlock)+raBlockSize+raPad/np.cos(np.radians(decMin))
-
+                
                 if (wrapRA(raMin) != raMin) & (wrapRA(raMax) != raMax):
                     # near a pole, just grab all the stars
                     sqlwhere += '' 
@@ -82,23 +81,26 @@ def genCatalog(visits, starsDbAddress, offsets=None, lsstFilter='r', raBlockSize
                     raMax = wrapRA(raMax)
                     # no wrap
                     if raMin < raMax:
-                        slqwhere += 'and ra < %f and ra > %f '%(raMax,raMin)
+                        sqlwhere += 'and ra < %f and ra > %f '%(raMax,raMin)
                     # One side wrapped
                     else:
                         sqlwhere += 'and (ra > %f or ra < %f)'%(raMin,raMax)
-
+                print 'quering stars with: '+sqlwhere
                 stars = msrgbDB.tables['stars'].query_columns_Array(
                     colnames=starCols, constraint=sqlwhere)
+                print 'got %i stars'%stars.size
+                # XXX -- add all the columns I will want here, then I only do
+                # one numpy stack per block rather than lots of stacks per visit!
+                
                 # Add any interesting columns, maybe primary healpix id and hpid 1-4
             for visit in visitsIn:
                 # Calc x,y, radius for each star, crop off stars outside the FoV
                 # XXX - plan to replace with code to see where each star falls and get chipID, etc
-                print 'star size=',stars.size
                 starsIn = starsProject(stars, visit)
                 starsIn = starsIn[np.where(starsIn['radius'] <= np.radians(radiusFoV))]
                 
-                newIDs = np.in1d(starsIn['starID'], idsUsed, invert=True)
-                idsUsed.extend(starsIn['starID'][newIDs].tolist())
+                newIDs = np.in1d(starsIn['id'], idsUsed, invert=True)
+                idsUsed.extend(starsIn['id'][newIDs].tolist())
                 
                 # Assign patchIDs and healpix IDs
                 starsIn = assignPatches(starsIn, visit, nPatches=nPatches)
@@ -109,7 +111,7 @@ def genCatalog(visits, starsDbAddress, offsets=None, lsstFilter='r', raBlockSize
                     starsIn = offset.run(starsIn, visit)
 
                 # Total up all the dmag's to make the observed magnitude
-                keys = [key for key in starsIn.keys() if key[0:4] == 'dmag']
+                keys = [key for key in starsIn.dtype.names if key[0:4] == 'dmag']
                 obsMag = starsIn['%smag'%lsstFilter]
                 for key in keys:
                     obsMag += starsIn[key]
@@ -118,12 +120,12 @@ def genCatalog(visits, starsDbAddress, offsets=None, lsstFilter='r', raBlockSize
                 # patchID, starID, observed Mag, mag uncertainty, radius, healpixIDs
                 for star,obsmag in zip(starsIn,obsMag):
                     print >>ofile, "%i, %i, %f, %f, %f, %i "%( \
-                        star['patchID'],star['starID'], obsMag, star['obsMagUncert'],
-                        star['radius'], star['hpID'])
+                        star['patchID'],star['id'], obsmag, 0., #star['obsMagUncert'],
+                        star['radius'], 0) #star['hpID'])
 
                 # Note the new starID's and print those to a truth file
                 # starID true mag
-                for ID,mag in zip(starsIn['starID'][newID],starsIn['%smag'%lsstFilter][newID]):
+                for ID,mag in zip(starsIn['id'][newIDs],starsIn['%smag'%lsstFilter][newIDs]):
                     print >>tfile, '%i, %f'%(ID, mag)
 
                 # Calc and print a patch file.  Note this is slightly ambiguous since the clouds can have structure

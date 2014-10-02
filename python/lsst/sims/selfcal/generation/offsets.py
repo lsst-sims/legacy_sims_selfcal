@@ -40,14 +40,13 @@ class OffsetSNR(BaseOffset):
         Generate offsets based on the 5-sigma limiting depth of an observation and the brightness of the star.
         Note that this takes into account previous offsets that have been applied
         (so run this after things like vingetting).
-        error_sys:  Systematic error floor for photometry (in mags)
         """
         self.lsstFilter=lsstFilter
         self.newkey = 'dmag_snr'
         self.gamma = {'u':0.037, 'g':0.038, 'r':0.039, 'i':0.039,'z':0.040,'y':0.040 }
         self.gamma = self.gamma[lsstFilter]
         
-    def calcMagErrors(magnitudes, lsstFilter='r', m5=24.7):
+    def calcMagErrors(self, magnitudes, lsstFilter='r', m5=24.7):
         """Right now this is assuming airmass of 1.2 and median sky brightness for all observations.  """
         xval=magnitudes * 0.0
         error_rand = magnitudes * 0.0
@@ -59,13 +58,13 @@ class OffsetSNR(BaseOffset):
         
     def run(self, stars, visit):
         temp_mag = stars[self.lsstFilter+'mag'].copy()
-        keys = stars.dtype.names()
+        keys = stars.dtype.names
         dmagKeys = [key for key in keys if key[0:4]=='dmag']
         # calc what magnitude the star has when it hits the silicon. Thus we compute the SNR noise
         # AFTER things like cloud extinction and vingetting.
-        for key in dmagKeys:
-            temp_mag += stars[key]
         
+        for key in dmagKeys:
+            temp_mag = temp_mag + stars[key]
         dmag = self.calcMagErrors(temp_mag, m5 = visit['fiveSigmaDepth'] ).astype(zip([self.newkey],[float]))
         stars = rfn.merge_arrays( [ stars, dmag], flatten=True, usemask=False)
         return stars
