@@ -7,7 +7,7 @@ class BaseOffset(object):
     def __init__(self, **kwargs):
         self.newkey = 'dmag_keyname'
         pass
-    def run(self, stars, visit):
+    def run(self, stars, visit, **kwargs):
         pass
 
 
@@ -15,22 +15,19 @@ class NoOffset(BaseOffset):
     def __init__(self):
         """ Make no changes to the mags """
         self.newkey = 'dmag_zero'
-    def run(self, stars,visits):
+    def run(self, stars,visits, **kwargs):
         dmag = np.zeros(stars.size, dtype=zip([self.newkey],[float]))
-        stars = rfn.merge_arrays( [ stars, dmag], flatten=True, usemask=False)
-        return stars    
+        return dmag
 
 class OffsetSys(BaseOffset):
     def __init__(self, error_sys=0.003):
         """Systematic error floor for photometry"""
         self.error_sys = error_sys
         self.newkey = 'dmag_sys'
-    def run(self, stars,visits):
+    def run(self, stars,visits, **kwargs):
         nstars = np.size(stars)
         dmag = np.random.rand(nstars)*self.error_sys
-        dmag = np.array(dmag, dtype=zip([self.newkey],[float]))
-        stars = rfn.merge_arrays( [ stars, dmag], flatten=True, usemask=False)
-        return stars
+        return dmag
     
 
 class OffsetSNR(BaseOffset):
@@ -56,16 +53,15 @@ class OffsetSNR(BaseOffset):
         dmag = np.random.rand(len(magnitudes))*magnitude_errors
         return dmag
         
-    def run(self, stars, visit):
+    def run(self, stars, visit, dmags=None):
+        if dmags is None:
+            dmags = {}
         temp_mag = stars[self.lsstFilter+'mag'].copy()
-        keys = stars.dtype.names
-        dmagKeys = [key for key in keys if key[0:4]=='dmag']
         # calc what magnitude the star has when it hits the silicon. Thus we compute the SNR noise
         # AFTER things like cloud extinction and vingetting.
         
-        for key in dmagKeys:
-            temp_mag = temp_mag + stars[key]
-        dmag = self.calcMagErrors(temp_mag, m5 = visit['fiveSigmaDepth'] ).astype(zip([self.newkey],[float]))
-        stars = rfn.merge_arrays( [ stars, dmag], flatten=True, usemask=False)
-        return stars
+        for key in dmags.keys():
+            temp_mag = temp_mag + dmags[key]
+        dmag = self.calcMagErrors(temp_mag, m5 = visit['fiveSigmaDepth'] )
+        return dmag
     

@@ -23,12 +23,15 @@ def genCatalog(visits, starsDbAddress, offsets=None, lsstFilter='r', raBlockSize
     visits:  A numpy array with the properties of the visits.  Expected to have Opsim-like values
     starsDbAddress:  a sqlAlchemy address pointing to a database that contains properties of stars used as input.
     offsets:  A list of instatiated classes that will apply offsets to the stars
-    lsstFilter:  Which filter to use for the observed stars.
+    lsstFilter:  Which filter to use for the observed stars
     obsFile:  File to write the observed stellar magnitudes to
     truthFile:  File to write the true stellar magnitudes to
+    raBlockSize/decBlockSize:  Size of chucks to use when looping over the sky
+    nPatches:  Number of patches to divide the FoV into.  Must be an integer squared
+    radiusFoV: Radius of the telescope field of view in degrees
+    seed: random number seed
     """
 
-    
     if offsets is None:
         # Maybe change this to just run with a default SNR offset
         warnings.warn("Warning, no offsets set, returning without running")
@@ -90,18 +93,18 @@ def genCatalog(visits, starsDbAddress, offsets=None, lsstFilter='r', raBlockSize
                 stars = msrgbDB.tables['stars'].query_columns_Array(
                     colnames=starCols, constraint=sqlwhere)
                 print 'got %i stars'%stars.size
-                # XXX -- add all the columns I will want here, then I only do
+                # Add all the columns I will want here, then I only do
                 # one numpy stack per block rather than lots of stacks per visit
                 # Ugh, feels like writing fortran though...
-                newcols = ['x', 'y', 'radius', 'patchID', 'subPatch', 'hpID']
+                newcols = ['x', 'y', 'radius', 'patchID', 'subPatch', 'hpID', 'hp1', 'hp2', 'hp3', 'hp4']
                 newtypes = [float, float, float, int,int, int]
                 stars = rfn.merge_arrays([stars, np.zeros(stars.size, dtype=zip(newcols,newtypes))],
                                          flatten=True, usemask=False)
                 
-                # Add any interesting columns, maybe primary healpix id and hpid 1-4
             for visit in visitsIn:
+                dmags = {}
                 # Calc x,y, radius for each star, crop off stars outside the FoV
-                # XXX - plan to replace with code to see where each star falls and get chipID, etc
+                # XXX - plan to replace with code to see where each star falls and get chipID.
                 starsIn = starsProject(stars, visit)
                 starsIn = starsIn[np.where(starsIn['radius'] <= np.radians(radiusFoV))]
                 
@@ -114,13 +117,13 @@ def genCatalog(visits, starsDbAddress, offsets=None, lsstFilter='r', raBlockSize
                 
                 # Apply the offsets that have been configured
                 for offset in offsets:
-                    starsIn = offset.run(starsIn, visit)
+                    dmags[offset.newkey] = offset.run(starsIn, visit, dmags=dmags)
 
                 # Total up all the dmag's to make the observed magnitude
-                keys = [key for key in starsIn.dtype.names if key[0:4] == 'dmag']
+                keys = dmags.keys()
                 obsMag = starsIn['%smag'%lsstFilter]
                 for key in keys:
-                    obsMag += starsIn[key]
+                    obsMag += dmags[key]
                 nObs += starsIn.size
                     
                 # patchID, starID, observed Mag, mag uncertainty, radius, healpixIDs
