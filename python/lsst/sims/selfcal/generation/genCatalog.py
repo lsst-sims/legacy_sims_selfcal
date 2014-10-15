@@ -2,6 +2,8 @@ import numpy as np
 import lsst.sims.maf.db as db
 from lsst.sims.selfcal.generation.starsTools import starsProject, assignPatches
 import numpy.lib.recfunctions as rfn
+from .offsets import OffsetSNR
+
 
 def wrapRA(ra):
     """Wraps RA into 0-360 degrees."""
@@ -13,7 +15,7 @@ def capDec(dec):
     dec = np.where(dec>90, 90, dec)
     dec = np.where(dec<-90, -90, dec)
     return dec
-  
+
 
 def genCatalog(visits, starsDbAddress, offsets=None, lsstFilter='r', raBlockSize=20., decBlockSize=10.,
                nPatches=16, radiusFoV=1.8, verbose=True, seed=42, obsFile='observations.dat', truthFile='starInfo.dat'):
@@ -41,7 +43,9 @@ def genCatalog(visits, starsDbAddress, offsets=None, lsstFilter='r', raBlockSize
     ofile = open(obsFile, 'w')
     tfile = open(truthFile, 'w')
 
-    
+    print >>ofile, '#PatchID, StarID, ObservedMag, MagUncertainty, Radius, HPID'
+    print >>tfile, '#StarID, TrueMag'
+
     # Set up connection to stars db:
     msrgbDB = db.Database(starsDbAddress, dbTables={'stars':['stars', 'id']})
     starCols = ['id', 'rmag', 'gmag', 'ra', 'decl']
@@ -51,11 +55,13 @@ def genCatalog(visits, starsDbAddress, offsets=None, lsstFilter='r', raBlockSize
     # Loop over the sky
     raBlocks = np.arange(0.,2.*np.pi, np.radians(raBlockSize))
     decBlocks = np.arange(-np.pi, np.pi, np.radians(decBlockSize) )
-    
+
     # List to keep track of which starIDs have been written to truth file
     idsUsed = []
     nObs = 0
-    
+
+    magUncert = OffsetSNR(lsstFilter=lsstFilter)
+
     for raBlock in raBlocks:
         for decBlock in decBlocks:
             # The idea here is that this could be run in parallel or not and is still repeatable
@@ -69,17 +75,17 @@ def genCatalog(visits, starsDbAddress, offsets=None, lsstFilter='r', raBlockSize
             if np.size(visitsIn) > 0:
                 # Fetch the stars in this block+the radiusFoV
                 decPad = radiusFoV
-                raPad = radiusFoV 
+                raPad = radiusFoV
                 # Need to deal with wrap around effects.
                 decMin = capDec(np.degrees(decBlock)-decPad)
                 decMax = capDec(np.degrees(decBlock)+decBlockSize+decPad)
                 sqlwhere = 'decl > %f and decl < %f '%(decMin, decMax)
                 raMin = np.degrees(raBlock)-raPad/np.cos(np.radians(decMin))
                 raMax = np.degrees(raBlock)+raBlockSize+raPad/np.cos(np.radians(decMin))
-                
+
                 if (wrapRA(raMin) != raMin) & (wrapRA(raMax) != raMax):
                     # near a pole, just grab all the stars
-                    sqlwhere += '' 
+                    sqlwhere += ''
                 else:
                     raMin = wrapRA(raMin)
                     raMax = wrapRA(raMax)
@@ -100,21 +106,21 @@ def genCatalog(visits, starsDbAddress, offsets=None, lsstFilter='r', raBlockSize
                 newtypes = [float, float, float, int,int, int]
                 stars = rfn.merge_arrays([stars, np.zeros(stars.size, dtype=zip(newcols,newtypes))],
                                          flatten=True, usemask=False)
-                
+
             for visit in visitsIn:
                 dmags = {}
                 # Calc x,y, radius for each star, crop off stars outside the FoV
                 # XXX - plan to replace with code to see where each star falls and get chipID.
                 starsIn = starsProject(stars, visit)
                 starsIn = starsIn[np.where(starsIn['radius'] <= np.radians(radiusFoV))]
-                
+
                 newIDs = np.in1d(starsIn['id'], idsUsed, invert=True)
                 idsUsed.extend(starsIn['id'][newIDs].tolist())
-                
+
                 # Assign patchIDs and healpix IDs
                 starsIn = assignPatches(starsIn, visit, nPatches=nPatches)
                 #maybe make dmags a dict on stars, so that it's faster to append them all?
-                
+
                 # Apply the offsets that have been configured
                 for offset in offsets:
                     dmags[offset.newkey] = offset.run(starsIn, visit, dmags=dmags)
@@ -125,16 +131,21 @@ def genCatalog(visits, starsDbAddress, offsets=None, lsstFilter='r', raBlockSize
                 for key in keys:
                     obsMag += dmags[key]
                 nObs += starsIn.size
-                    
+
+                # Calculate the uncertainty in the observed mag:
+                magErr = magUncert.calcMagErrors(obsMag, errOnly=True, m5=visit['fiveSigmaDepth'])
+
                 # patchID, starID, observed Mag, mag uncertainty, radius, healpixIDs
-                for star,obsmag in zip(starsIn,obsMag):
+                for star,obsmag,magE in zip(starsIn,obsMag,magErr):
                     print >>ofile, "%i, %i, %f, %f, %f, %i "%( \
-                        star['patchID'],star['id'], obsmag, 0., #star['obsMagUncert'],
+                        star['patchID'],star['id'], obsmag, magE,
                         star['radius'], 0) #star['hpID'])
 
                 # Note the new starID's and print those to a truth file
                 # starID true mag
                 # XXX--might be better to just collect these and print at the end so that they can be sorted?
+                # XXX - even better, just save them to a numpy save file, sorted, since the obs are teh only
+                # thing that really needs to go to ASCII!
                 for ID,mag in zip(starsIn['id'][newIDs],starsIn['%smag'%lsstFilter][newIDs]):
                     print >>tfile, '%i, %f'%(ID, mag)
 
@@ -144,7 +155,7 @@ def genCatalog(visits, starsDbAddress, offsets=None, lsstFilter='r', raBlockSize
                 # Look at the distribution of dmags
                 # patchID, starID, dmag1, dmag2, dmag3...
 
-    
+
     ofile.close()
     tfile.close()
     return nObs, len(idsUsed)

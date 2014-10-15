@@ -1,1 +1,1 @@
-from .fastread import *
+from .fastRead import *

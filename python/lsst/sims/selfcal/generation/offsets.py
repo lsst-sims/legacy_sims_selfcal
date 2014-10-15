@@ -28,7 +28,7 @@ class OffsetSys(BaseOffset):
         nstars = np.size(stars)
         dmag = np.random.rand(nstars)*self.error_sys
         return dmag
-    
+
 
 class OffsetSNR(BaseOffset):
     """ """
@@ -42,26 +42,29 @@ class OffsetSNR(BaseOffset):
         self.newkey = 'dmag_snr'
         self.gamma = {'u':0.037, 'g':0.038, 'r':0.039, 'i':0.039,'z':0.040,'y':0.040 }
         self.gamma = self.gamma[lsstFilter]
-        
-    def calcMagErrors(self, magnitudes, lsstFilter='r', m5=24.7):
+
+    def calcMagErrors(self, magnitudes, lsstFilter='r', m5=24.7, errOnly=False):
         """Right now this is assuming airmass of 1.2 and median sky brightness for all observations.  """
         xval=magnitudes * 0.0
         error_rand = magnitudes * 0.0
         magnitude_errors = magnitudes * 0.0
         xval = np.power(10., 0.4*(magnitudes - m5))
         magnitude_errors = np.sqrt( (0.04-self.gamma)*xval + self.gamma*xval*xval)
-        dmag = np.random.rand(len(magnitudes))*magnitude_errors
+        if errOnly:
+            dmag = magnitude_errors
+        else:
+            dmag = np.random.rand(len(magnitudes))*magnitude_errors
         return dmag
-        
+
     def run(self, stars, visit, dmags=None):
         if dmags is None:
             dmags = {}
         temp_mag = stars[self.lsstFilter+'mag'].copy()
         # calc what magnitude the star has when it hits the silicon. Thus we compute the SNR noise
         # AFTER things like cloud extinction and vingetting.
-        
+
         for key in dmags.keys():
             temp_mag = temp_mag + dmags[key]
         dmag = self.calcMagErrors(temp_mag, m5 = visit['fiveSigmaDepth'] )
         return dmag
-    
+
