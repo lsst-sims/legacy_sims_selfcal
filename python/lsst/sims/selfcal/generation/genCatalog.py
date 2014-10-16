@@ -3,6 +3,7 @@ import lsst.sims.maf.db as db
 from lsst.sims.selfcal.generation.starsTools import starsProject, assignPatches
 import numpy.lib.recfunctions as rfn
 from .offsets import OffsetSNR
+from scipy.spatial import cKDTree as kdtree
 
 
 def wrapRA(ra):
@@ -15,6 +16,30 @@ def capDec(dec):
     dec = np.where(dec>90, 90, dec)
     dec = np.where(dec<-90, -90, dec)
     return dec
+
+def treexyz(ra, dec):
+    """Calculate x/y/z values for ra/dec points, ra/dec in radians."""
+    # Note ra/dec can be arrays.
+    x = np.cos(dec) * np.cos(ra)
+    y = np.cos(dec) * np.sin(ra)
+    z = np.sin(dec)
+    return x, y, z
+
+def buildTree(simDataRa, simDataDec,
+              leafsize=100):
+    """Build KD tree on simDataRA/Dec and set radius (via setRad) for matching.
+
+    simDataRA, simDataDec = RA and Dec values (in radians).
+    leafsize = the number of Ra/Dec pointings in each leaf node."""
+    if np.any(np.abs(simDataRa) > np.pi*2.0) or np.any(np.abs(simDataDec) > np.pi*2.0):
+        raise ValueError('Expecting RA and Dec values to be in radians.')
+    x, y, z = treexyz(simDataRa, simDataDec)
+    data = zip(x,y,z)
+    if np.size(data) > 0:
+        starTree = kdtree(data, leafsize=leafsize)
+    else:
+        raise ValueError('SimDataRA and Dec should have length greater than 0.')
+    return starTree
 
 
 def genCatalog(visits, starsDbAddress, offsets=None, lsstFilter='r', raBlockSize=20., decBlockSize=10.,
@@ -60,7 +85,13 @@ def genCatalog(visits, starsDbAddress, offsets=None, lsstFilter='r', raBlockSize
     idsUsed = []
     nObs = 0
 
+    # For computing what the 'expected' uncertainty on the observation will be
     magUncert = OffsetSNR(lsstFilter=lsstFilter)
+
+    # set the radius for the kdtree
+    x0, y0, z0 = (1, 0, 0)
+    x1, y1, z1 = treexyz(np.radians(radiusFoV), 0)
+    treeRadius = np.sqrt((x1-x0)**2+(y1-y0)**2+(z1-z0)**2)
 
     for raBlock in raBlocks:
         for decBlock in decBlocks:
@@ -106,14 +137,19 @@ def genCatalog(visits, starsDbAddress, offsets=None, lsstFilter='r', raBlockSize
                 newtypes = [float, float, float, int,int, int]
                 stars = rfn.merge_arrays([stars, np.zeros(stars.size, dtype=zip(newcols,newtypes))],
                                          flatten=True, usemask=False)
+                # Build a KDTree for the stars
+                starTree = buildTree(np.radians(stars['ra']),np.radians(stars['decl']) )
 
             for visit in visitsIn:
                 dmags = {}
                 # Calc x,y, radius for each star, crop off stars outside the FoV
                 # XXX - plan to replace with code to see where each star falls and get chipID.
-                starsIn = starsProject(stars, visit)
-                starsIn = starsIn[np.where(starsIn['radius'] <= np.radians(radiusFoV))]
-
+                vx,vy,vz = treexyz(visit['ra'], visit['dec'] )
+                indices = starTree.query_ball_point( (vx,vy,vz), treeRadius )
+                starsIn = stars[indices]
+                starsIn = starsProject(starsIn, visit)
+                # Not sure why, but this seems to still clip a few stars...
+                # starsIn = starsIn[np.where(starsIn['radius'] <= np.radians(radiusFoV))]
                 newIDs = np.in1d(starsIn['id'], idsUsed, invert=True)
                 idsUsed.extend(starsIn['id'][newIDs].tolist())
 

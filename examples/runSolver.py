@@ -23,5 +23,7 @@ resid = starsFit['fitMag'] - trueStars['TrueMag']
 
 resid = resid-np.median(resid)
 
+print 'median fitMag - TrueMag = %f'%np.median(resid)
+print 'std (fitMag - TrueMag) = %f'%np.std(resid)
 
 import pdb ; pdb.set_trace()
