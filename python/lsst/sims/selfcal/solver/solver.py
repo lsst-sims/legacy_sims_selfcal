@@ -24,27 +24,28 @@ class lsqrSolver(object):
         self.observations = fastRead(self.infile, dtype=zip(names,types), delimiter=',')
 
     def cleanData(self):
-        # Remove observations if star only observed once
-        self.observations.sort(order='starID')
-        good = np.where( (self.observations['starID']-np.roll(self.observations['starID'],1))*
-                 (self.observations['starID']-np.roll(self.observations['starID'],-1)) == 0)
-        self.observations = self.observations[good]
+        """
+        Remove observations that can't contribute to a solution.
+        Index remaining stars and patches so they are continuous.
+        """
+        nStart = 1.
+        nEnd = 0.
+        while nStart != nEnd:
+            nStart = self.observations.size
+            self.observations.sort(order='starID')
+            # Remove observations if the star was only observed once
+            good = np.where( (self.observations['starID']-np.roll(self.observations['starID'],1))*
+                             (self.observations['starID']-np.roll(self.observations['starID'],-1)) == 0)
+            self.observations = self.observations[good]
 
-        # Convert starID to continuos running index to keep matrix as small as possible
-        self.Stars=np.unique(self.observations['starID'])
-        nStars=np.size(self.Stars)
-        self.nStars = nStars
-        Stars_index = np.arange(1,nStars+1)
-        left = np.searchsorted(self.observations['starID'], self.Stars)
-        right = np.searchsorted(self.observations['starID'], self.Stars, side='right')
-        for i in range(np.size(left)): self.observations['starID'][left[i]:right[i]]=Stars_index[i]
+            # Remove patches with only one star
+            self.observations.sort(order='patchID')
 
-        # Remove patches with only one star
-        self.observations.sort(order='patchID')
+            good = np.where( (self.observations['patchID']-np.roll(self.observations['patchID'],1))*
+                             (self.observations['patchID']-np.roll(self.observations['patchID'],-1)) == 0)
+            self.observations = self.observations[good]
+            nEnd = self.observations.size
 
-        good = np.where( (self.observations['patchID']-np.roll(self.observations['patchID'],1))*
-                         (self.observations['patchID']-np.roll(self.observations['patchID'],-1)) == 0)
-        self.observations = self.observations[good]
         self.Patches = np.unique(self.observations['patchID'])
         nPatches=np.size(self.Patches)
         self.nPatches = nPatches
@@ -53,6 +54,18 @@ class lsqrSolver(object):
         left = np.searchsorted(self.observations['patchID'], self.Patches)
         right = np.searchsorted(self.observations['patchID'], self.Patches, side='right')
         for i in range(np.size(left)): self.observations['patchID'][left[i]:right[i]]=Patches_index[i]
+
+        # Convert starID to continuous running index to keep matrix as small as possible
+        self.observations.sort(order='starID')
+        self.Stars=np.unique(self.observations['starID'])
+        nStars=np.size(self.Stars)
+        self.nStars = nStars
+        Stars_index = np.arange(1,nStars+1)
+        left = np.searchsorted(self.observations['starID'], self.Stars)
+        right = np.searchsorted(self.observations['starID'], self.Stars, side='right')
+        for i in range(np.size(left)): self.observations['starID'][left[i]:right[i]]=Stars_index[i]
+
+
 
     def solveMatrix(self):
         nObs=np.size(self.observations)
@@ -85,4 +98,3 @@ class lsqrSolver(object):
         result['starID'] = self.Stars
         result['fitMag'] = self.solution[0][self.nPatches:]
         np.savez(self.starOut, result=result )
-

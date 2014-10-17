@@ -18,8 +18,15 @@ def starsProject(stars, visit):
     """
     names=['x','y','radius']
     types=[float,float,float]
-    stars['x'], stars['y'] = gnomonic_project_toxy(np.radians(stars['ra']),np.radians(stars['decl']),
+    xtemp,ytemp = gnomonic_project_toxy(np.radians(stars['ra']),np.radians(stars['decl']),
                                                visit['ra'], visit['dec'])
+    # Rotate the field using the visit rotSkyPos.  Hope I got that sign right...
+    # Hopefully this can be replaced with some cameraGeom stuff.
+    sin_rot = np.sin(visit['rotSkyPos'])
+    cos_rot = np.cos(visit['rotSkyPos'])
+    stars['x'] = cos_rot*xtemp + sin_rot*ytemp
+    stars['y'] = -1.*sin_rot*xtemp+cos_rot*ytemp
+
     stars['radius'] = (stars['x']**2+stars['y']**2)**0.5
     return stars
 
@@ -29,11 +36,11 @@ def assignPatches(stars, visit, nPatches=16, radiusFoV=1.8):
     """
     maxx, maxy =  gnomonic_project_toxy(0., np.radians(radiusFoV), 0., 0.)
     nsides = nPatches**0.5
-    
+
     # This should move all coords to  0 < x < nsides-1
     px = np.floor((stars['x'] + maxy)/(2.*maxy)*nsides)
     py = np.floor((stars['y'] + maxy)/(2.*maxy)*nsides)
-    
-    stars['subPatch'] = px + py*nsides 
+
+    stars['subPatch'] = px + py*nsides
     stars['patchID'] = stars['subPatch'] + visit['visitID']*nPatches
     return stars
