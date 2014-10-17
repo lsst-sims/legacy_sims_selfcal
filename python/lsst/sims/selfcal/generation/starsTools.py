@@ -27,6 +27,10 @@ def starsProject(stars, visit):
     stars['x'] = cos_rot*xtemp + sin_rot*ytemp
     stars['y'] = -1.*sin_rot*xtemp+cos_rot*ytemp
 
+    # XXX-temp try not rotating
+    #stars['x'] = xtemp
+    #stars['y'] = ytemp
+
     stars['radius'] = (stars['x']**2+stars['y']**2)**0.5
     return stars
 

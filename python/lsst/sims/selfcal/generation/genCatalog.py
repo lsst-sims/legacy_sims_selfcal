@@ -43,7 +43,8 @@ def buildTree(simDataRa, simDataDec,
 
 
 def genCatalog(visits, starsDbAddress, offsets=None, lsstFilter='r', raBlockSize=20., decBlockSize=10.,
-               nPatches=16, radiusFoV=1.8, verbose=True, seed=42, obsFile='observations.dat', truthFile='starInfo.dat'):
+               nPatches=16, radiusFoV=1.8, verbose=True, seed=42, uncertFloor=0.005,
+               obsFile='observations.dat', truthFile='starInfo.dat'):
     """
     Generate a catalog of observed stellar magnitudes.
 
@@ -57,6 +58,7 @@ def genCatalog(visits, starsDbAddress, offsets=None, lsstFilter='r', raBlockSize
     nPatches:  Number of patches to divide the FoV into.  Must be an integer squared
     radiusFoV: Radius of the telescope field of view in degrees
     seed: random number seed
+    uncertFloor: value to add in quadrature to magnitude uncertainties
     """
 
     if offsets is None:
@@ -169,7 +171,8 @@ def genCatalog(visits, starsDbAddress, offsets=None, lsstFilter='r', raBlockSize
                 nObs += starsIn.size
 
                 # Calculate the uncertainty in the observed mag:
-                magErr = magUncert.calcMagErrors(obsMag, errOnly=True, m5=visit['fiveSigmaDepth'])
+                magErr = (magUncert.calcMagErrors(obsMag, errOnly=True, m5=visit['fiveSigmaDepth'])**2
+                          + uncertFloor**2)**0.5
 
                 # patchID, starID, observed Mag, mag uncertainty, radius, healpixIDs
                 for star,obsmag,magE in zip(starsIn,obsMag,magErr):

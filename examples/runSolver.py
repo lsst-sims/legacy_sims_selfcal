@@ -3,6 +3,13 @@ from lsst.sims.selfcal.utils import fastRead
 import numpy as np
 import matplotlib.pylab as plt
 
+
+def robustRMS(val):
+    iqr = np.percentile(val,75)-np.percentile(val,25)
+    return iqr/1.349
+
+
+
 mySolver = lsqrSolver(infile='observations.dat', patchOut='solvedPatch.npz', starOut='solvedStar.npz')
 
 mySolver.run()
@@ -25,5 +32,11 @@ resid = resid-np.median(resid)
 
 print 'median fitMag - TrueMag = %f'%np.median(resid)
 print 'std (fitMag - TrueMag) = %f'%np.std(resid)
+print 'robust RMS = %f'%robustRMS(resid)
+rrms = robustRMS(resid)
 
-import pdb ; pdb.set_trace()
+plt.hist(resid, bins=100, range=(-4*rrms,4*rrms))
+plt.xlabel('Fit-True')
+plt.ylabel('#')
+
+plt.show()

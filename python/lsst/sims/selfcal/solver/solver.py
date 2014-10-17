@@ -6,11 +6,26 @@ from lsst.sims.selfcal.utils import fastRead
 # Modified from /astro/store/scratch/tmp/yoachim/Research/LSST/Parallel_Solver
 
 class lsqrSolver(object):
+    """
+    Class to read in the output from genCatalog.py and run the self-calibration solver and write the output.
 
-    def __init__(self, infile=None, patchOut=None, starOut=None):
+    Might want to expand this so it can be used to fit an arbitrary number of terms?
+    """
+
+    def __init__(self, infile=None, patchOut=None, starOut=None, atol=1e-8, btol=1e-8):
+        """
+        infile:  ASCII file from genCatalog
+        patchOut: filename for saving the patch zeropoints
+        starOut: filename for saving the star solutions
+        atol: tolerance for the solver
+        btol: tolerance for the solver
+        """
+
         self.infile = infile
         self.patchOut = patchOut
         self.starOut = starOut
+        self.atol=atol
+        self.btol=btol
 
     def run(self):
         self.readData()
@@ -45,6 +60,8 @@ class lsqrSolver(object):
                              (self.observations['patchID']-np.roll(self.observations['patchID'],-1)) == 0)
             self.observations = self.observations[good]
             nEnd = self.observations.size
+
+        self.observations.sort(order='patchID')
 
         self.Patches = np.unique(self.observations['patchID'])
         nPatches=np.size(self.Patches)
@@ -85,7 +102,7 @@ class lsqrSolver(object):
         A = coo_matrix( (data,(row,col)), shape = (nObs,self.nPatches+self.nStars))
         A = A.tocsr()
         # solve Ax = b
-        self.solution = lsqr(A,b, show=True)
+        self.solution = lsqr(A,b, show=True, atol=self.atol, btol=self.btol)
 
     def writeSoln(self):
 

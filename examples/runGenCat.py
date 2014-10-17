@@ -6,11 +6,11 @@ import lsst.sims.maf.db as db
 lsstFilter = 'r'
 
 # Read in an Opsim database
-opsimDB = db.OpsimDatabase('sqlite:///opsimblitz2_1060_sqlite.db') #db.OpsimDatabase('sqlite:///opsimblitz2_1060_sqlite.db')
+opsimDB = db.OpsimDatabase('sqlite:///opsimblitz2_1060_sqlite.db')
 #ralim=np.array([0,360])*np.pi/180.
 #declim=np.array([0,-90])*np.pi/180.
-ralim=np.array([0,20])*np.pi/180.
-declim=np.array([0,-20])*np.pi/180.
+ralim=np.array([40,60])*np.pi/180.
+declim=np.array([-40,-60])*np.pi/180.
 nightMax = 730
 
 cols = ['ditheredRA', 'ditheredDec', 'rotSkyPos', 'night', 'expMJD','fiveSigmaDepth','obsHistID' ]
@@ -28,4 +28,3 @@ offsetList.append(offsets.OffsetSNR() )
 
 # Generate the catalog
 nobs, nstars = genCatalog(visits, 'sqlite:///msrgb_1e6.sqlite', offsets=offsetList,lsstFilter=lsstFilter)
-
