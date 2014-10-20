@@ -71,7 +71,7 @@ def genCatalog(visits, starsDbAddress, offsets=None, lsstFilter='r', raBlockSize
     tfile = open(truthFile, 'w')
 
     print >>ofile, '#PatchID, StarID, ObservedMag, MagUncertainty, Radius, HPID'
-    print >>tfile, '#StarID, TrueMag'
+    print >>tfile, '#StarID, TrueMag, ra, dec'
 
     # Set up connection to stars db:
     msrgbDB = db.Database(starsDbAddress, dbTables={'stars':['stars', 'id']})
@@ -141,6 +141,13 @@ def genCatalog(visits, starsDbAddress, offsets=None, lsstFilter='r', raBlockSize
                                          flatten=True, usemask=False)
                 # Build a KDTree for the stars
                 starTree = buildTree(np.radians(stars['ra']),np.radians(stars['decl']) )
+                newIDs = np.in1d(stars['id'], idsUsed, invert=True, assume_unique=True)
+                newIDs = np.arange(stars['id'].size)[newIDs]
+                for newID in  newIDs:
+                    print >>tfile, '%i, %f, %f, %f'%(stars['id'][newID],stars['%smag'%lsstFilter][newID],
+                                                     stars['ra'][newID], stars['decl'][newID])
+
+                idsUsed.extend(stars['id'][newIDs].tolist())
 
             for visit in visitsIn:
                 dmags = {}
@@ -150,10 +157,6 @@ def genCatalog(visits, starsDbAddress, offsets=None, lsstFilter='r', raBlockSize
                 indices = starTree.query_ball_point( (vx,vy,vz), treeRadius )
                 starsIn = stars[indices]
                 starsIn = starsProject(starsIn, visit)
-                # Not sure why, but this seems to still clip a few stars...
-                # starsIn = starsIn[np.where(starsIn['radius'] <= np.radians(radiusFoV))]
-                newIDs = np.in1d(starsIn['id'], idsUsed, invert=True)
-                idsUsed.extend(starsIn['id'][newIDs].tolist())
 
                 # Assign patchIDs and healpix IDs
                 starsIn = assignPatches(starsIn, visit, nPatches=nPatches)
@@ -185,8 +188,6 @@ def genCatalog(visits, starsDbAddress, offsets=None, lsstFilter='r', raBlockSize
                 # XXX--might be better to just collect these and print at the end so that they can be sorted?
                 # XXX - even better, just save them to a numpy save file, sorted, since the obs are teh only
                 # thing that really needs to go to ASCII!
-                for ID,mag in zip(starsIn['id'][newIDs],starsIn['%smag'%lsstFilter][newIDs]):
-                    print >>tfile, '%i, %f'%(ID, mag)
 
                 # Calc and print a patch file.  Note this is slightly ambiguous since the clouds can have structure
                 # patchID magOffset
