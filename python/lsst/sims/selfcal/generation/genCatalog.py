@@ -186,7 +186,7 @@ def genCatalog(visits, starsDbAddress, offsets=None, lsstFilter='r', raBlockSize
                 # Note the new starID's and print those to a truth file
                 # starID true mag
                 # XXX--might be better to just collect these and print at the end so that they can be sorted?
-                # XXX - even better, just save them to a numpy save file, sorted, since the obs are teh only
+                # XXX - even better, just save them to a numpy save file, sorted, since the obs are the only
                 # thing that really needs to go to ASCII!
 
                 # Calc and print a patch file.  Note this is slightly ambiguous since the clouds can have structure

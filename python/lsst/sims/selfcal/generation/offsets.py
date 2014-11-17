@@ -1,5 +1,7 @@
 import numpy as np
 import numpy.lib.recfunctions as rfn
+from lsst.sims.selfcal.clouds.Arma import ArmaSf, Clouds
+
 
 
 class BaseOffset(object):
@@ -9,7 +11,6 @@ class BaseOffset(object):
         pass
     def run(self, stars, visit, **kwargs):
         pass
-
 
 class NoOffset(BaseOffset):
     def __init__(self):
@@ -29,6 +30,42 @@ class OffsetSys(BaseOffset):
         dmag = np.random.rand(nstars)*self.error_sys
         return dmag
 
+class OffsetClouds(BaseOffset):
+    def __init__(self,  sampling=256, fov=3.5):
+        self.fov = fov
+        self.newkey = 'dmag_cloud'
+        self.SF = ArmaSf()
+        self.cloud = Clouds()
+
+    def run(self, stars, visits, **kwargs):
+        # XXX-Double check extinction is close to the Opsim transparency
+        extinc_mags = visits['transparency']
+        if extinc_mags != 0.:
+            # need to decide on how to get extinc_mags from Opsim
+            # Maybe push some of these params up to be setable?
+            SFtheta, SFsf = self.SF.CloudSf(500., 300., 5., extinc_mags, .55)
+            # Call the Clouds
+            self.cloud.makeCloudImage(SFtheta,SFsf,extinc_mags, fov=self.fov)
+            # Interpolate clouds to correct position.  Nearest neighbor for speed?
+            nim = self.cloud.cloudimage[0,:].size
+            # calc position in cloud image of each star
+            starx_interp = (np.degrees(stars['x']) + self.fov/2.)*3600./ self.cloud.pixscale
+            stary_interp = (np.degrees(stars['y']) + self.fov/2.)*3600./ self.cloud.pixscale
+
+            # Round off position and make it an int
+            starx_interp = np.round(starx_interp).astype(int)
+            stary_interp = np.round(stary_interp).astype(int)
+
+            # Handle any stars that are out of the field for some reason
+            starx_interp[np.where(starx_interp < 0)] = 0
+            starx_interp[np.where(starx_interp > nim-1)] = nim-1
+            stary_interp[np.where(stary_interp < 0)] = 0
+            stary_interp[np.where(stary_interp > nim-1)] = nim-1
+
+            dmag = self.cloud.cloudimage[starx_interp,stary_interp]
+        else:
+            dmag = np.zeros(stars.size)
+        return dmag
 
 class OffsetSNR(BaseOffset):
     """ """
