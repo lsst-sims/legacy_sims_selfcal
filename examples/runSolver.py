@@ -2,6 +2,9 @@ from lsst.sims.selfcal.solver import lsqrSolver
 from lsst.sims.selfcal.utils import fastRead
 import numpy as np
 import matplotlib.pylab as plt
+from lsst.sims.selfcal.analysis.healplots import healbin
+import healpy as hp
+
 
 
 def robustRMS(val):
@@ -37,7 +40,11 @@ print 'robust RMS = %f'%robustRMS(resid)
 rrms = robustRMS(resid)
 
 plt.hist(resid, bins=100, range=(-4*rrms,4*rrms))
-plt.xlabel('Fit-True')
+plt.xlabel('Fit-True (mags)')
 plt.ylabel('#')
 
 plt.show()
+
+healmap = healbin(np.radians(trueStars['ra']), np.radians(trueStars['dec']), resid)
+hp.mollview(healmap, min =-4*rrms, max=4*rrms, unit='Residuals (mag)')
+
