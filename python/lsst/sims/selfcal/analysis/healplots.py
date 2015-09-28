@@ -1,7 +1,7 @@
 import numpy as np
 import healpy as hp
 
-def healbin(ra, dec, values, nside=128, reduceFunc=np.mean, dtype='float'):
+def healbin(ra, dec, values, nside=128, reduceFunc=np.mean, dtype='float', returnPixAng=False):
     """Take arrays of ra, dec, and value and bin into healpixels  """
 
     lat = np.pi/2. - dec
@@ -20,8 +20,11 @@ def healbin(ra, dec, values, nside=128, reduceFunc=np.mean, dtype='float'):
     for idx in pixids:
         mapVals[idx] = reduceFunc(values[left[idx]:right[idx]] )
 
-    return mapVals
 
-
-
-
+    if returnPixAng:
+        lat, lon = hp.pix2ang(nside,pixids)
+        decRet = np.pi/2. - lat
+        raRet = lon
+        return mapVals, raRet, decRet
+    else:
+        return mapVals
