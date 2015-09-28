@@ -49,6 +49,7 @@ import time
 # for illumination correction
 import pyfits as pf
 from scipy.interpolate import interp2d, interp1d
+import numpy.lib.recfunctions as rfn
 
 import healpy as hp
 
@@ -998,6 +999,13 @@ def createVisitErrors(visits, zp_max, zp_grad_max, colterm_max, colterm_rad_max,
     Returns ra/dec for each visit with dither, zeropoint/zeropointgrad, color/colorgrad. """
     random.seed(random_seed)
     nvisits = len(visits['ra'])
+
+    # Add the new columns needed
+    names = ['zpOff', 'zpGrad', 'zpGradDir', 'colorterm', 'colortermRad',
+             'flatPhase','filterPosition', 'angles','filterXoff', 'filterYoff' ]
+    visits= rfn.merge_arrays([visits, np.zeros(nvisits, dtype=zip(names,[float]*len(names)))],
+                             flatten=True, usemask=False)
+    
     # Generate flat distribution of random zeropoint offsets between zero and zp_max. 
     #  note that random.rand(nvisits) returns a n array of values between 0-1 of length nvisits.
     visits['zpOff'] = zp_max*random.rand(nvisits)
@@ -1091,7 +1099,7 @@ def generateStars(sfile, id_start, ra_min, ra_max, dec_min, dec_max, mag_min, ma
     return stars, nstars, id_next
 
 def getStars_db(sfile, cursor, calsimtable, id_start, ra_min, ra_max, dec_min, dec_max,
-                mag_min, mag_max, nstars, col_min=-0.5, col_max=3.5, filter='r'):
+                mag_min, mag_max, nstars, col_min=-0.5, col_max=3.5, lsstFilter='r'):
     """Get star information from star database (pass cursor to db connection). 
 
     Writes stars true magnitudes and colors to a flat file, when pulled from database.
@@ -1204,7 +1212,8 @@ def generateStarMags(visits, ra_min, ra_max, dec_min, dec_max, mag_min, mag_max,
                      mag_rand_error, gainvar, exptvar, nside, healshift, calcerror,
                      npatch=16, use_calsim=False, use_cloudsimage=False,  cloud_scale=0.034,
                      cursor=None, calsimtable=None, nstars=None,
-                     id_start=0, random_seed=None, fluxNoise=0.01, fluxFrac=0, filter='r', errorDist='Gaussian', systematicErr=0.004):
+                     id_start=0, random_seed=None, fluxNoise=0.01, fluxFrac=0,
+                     lsstFilter='r', errorDist='Gaussian', systematicErr=0.004, dbAddress='sqlite:///msrgb_1e6.sqlite'):
     """Given visits, generates magnitudes for each observation of a star within ra/dec min/max.
     
     Pulls information for stars from a database using getStars_db or from random star distribution using
@@ -1224,20 +1233,37 @@ def generateStarMags(visits, ra_min, ra_max, dec_min, dec_max, mag_min, mag_max,
         condition = ( (visits['ra'] >= ramin - rad_fov_deg/np.cos(visits['dec']*deg2rad)) |
                       (visits['ra'] <= ramax + rad_fov_deg/np.cos(visits['dec']*deg2rad)))
     condition = condition & (visits['dec'] > decmin - rad_fov_deg) & (visits['dec'] < decmax + rad_fov_deg)
-    blockvisits = {}
-    for key in visits.keys():
-        blockvisits[key] = visits[key][condition]
+    #blockvisits = {}
+    #for key in visits.keys():
+    #    blockvisits[key] = visits[key][condition]
+    blockvisits = visits[condition]
     if len(blockvisits['ra']) == 0:
         return id_start
-    # Get stars that fall into this block of sky. 
-    if use_calsim:
-        stars, nstars_found, id_next = getStars_db(sfile, cursor, calsimtable, id_start,
-                                                   ra_min, ra_max, dec_min, dec_max,
-                                                   mag_min, mag_max, nstars, col_min, col_max, filter=filter)
-    else:        
-        stars, nstars_made, id_next = generateStars(sfile, id_start, ra_min, ra_max, dec_min, dec_max,
-                                                    mag_min, mag_max, nstars, col_min, col_max,
-                                                    random_seed)
+    # Get stars that fall into this block of sky.
+    
+    
+    msrgbDB = db.Database(dbAddress, dbTables={'stars':['stars', 'simobjid']})
+    sqlwhere='(decl between %s and %s) and (ra between %s and %s) '%(dec_min, dec_max, ra_min,ra_max)
+    colorCols=['rmag','gmag', 'ra','decl']
+    cols=['simobjid',lsstFilter+'mag']
+    for col in colorCols:
+        if col not in cols:
+            cols.append(col)
+    stars = msrgbDB.tables['stars'].query_columns_Array(colnames=cols, constraint=sqlwhere)
+    nstars = np.size(stars)
+    stars = rfn.merge_arrays([stars, np.zeros(nstars, dtype=zip(['id'],[float]))],
+                             flatten=True, usemask=False)
+    stars['id'] = np.arange(nstars)+id_start
+    id_start += nstars
+    
+#    if use_calsim:
+#        stars, nstars_found, id_next = getStars_db(sfile, cursor, calsimtable, id_start,
+#                                                   ra_min, ra_max, dec_min, dec_max,
+#                                                   mag_min, mag_max, nstars, col_min, col_max, filter=filter)
+#    else:        
+#        stars, nstars_made, id_next = generateStars(sfile, id_start, ra_min, ra_max, dec_min, dec_max,
+#                                                    mag_min, mag_max, nstars, col_min, col_max,
+#                                                    random_seed)
     #if we hit a patch where there are no stars, just bail out
     if (blockvisits['ra'] == None) or (stars['ra'] == None):
         return id_next
@@ -1487,7 +1513,7 @@ def generateStarMags(visits, ra_min, ra_max, dec_min, dec_max, mag_min, mag_max,
             #starsFOV['dmag_snr'] = random.randn(len(starsFOV['ra'])) * \
             #                       calcMagErrors(starsFOV['rmagtrue'], m5=m5, filter=filter, error_sys=0.0)
         starsFOV['dmag_snr'] = random.randn(len(starsFOV['ra'])) * \
-                               calcMagErrors(rmag_temp, m5=m5, filter=filter, error_sys=0.) #make snr error always Gaussian
+                               calcMagErrors(rmag_temp, m5=m5, lsstFilter=lsstFilter, error_sys=0.) #make snr error always Gaussian
         # so this random error includes random jitter plus SNR error
         starsFOV['dmag_rand'] = np.sqrt(starsFOV['dmag_snr']**2 + starsFOV['dmag_var']**2)
         starsFOV['rmagobs'] = (starsFOV['rmagtrue'] + starsFOV['dmag_var'] + starsFOV['dmag_snr'] + \
@@ -1503,7 +1529,7 @@ def generateStarMags(visits, ra_min, ra_max, dec_min, dec_max, mag_min, mag_max,
             
         # Calculate reported error
         if calcerror:
-            starsFOV['magerr'] = calcMagErrors(starsFOV['rmagtrue'], m5=m5, filter=filter)
+            starsFOV['magerr'] = calcMagErrors(starsFOV['rmagtrue'], m5=m5, lsstFilter=lsstFilter)
         else:
             cut_off=0.001
             #temp =  starsFOV['rmagtrue']*0+np.std(starsFOV['rmagtrue']-starsFOV['rmagobs'])
@@ -1601,7 +1627,7 @@ def generateStarMags(visits, ra_min, ra_max, dec_min, dec_max, mag_min, mag_max,
     return id_next
 
 
-def calcMagErrors(magnitudes, filter='r', m5=24.7, error_sys=0.004):
+def calcMagErrors(magnitudes, lsstFilter='r', m5=24.7, error_sys=0.004):
     """Right now this is assuming airmass of 1.2 and median sky brightness for all observations.  """
     xval=magnitudes * 0.0
     error_rand = magnitudes * 0.0
@@ -1611,7 +1637,7 @@ def calcMagErrors(magnitudes, filter='r', m5=24.7, error_sys=0.004):
 #    error_data['m5']=np.array([23.9,25.0,24.7,24.0,23.3,22.1])
 #    error_data['delta_m5']=np.array([0.21,0.16,0.14,0.13,0.13,0.13])
     error_data['gamma']=np.array([0.037,0.038,0.039,0.039,0.040,0.040])
-    matched=np.where(error_data['filters'] == filter)
+    matched=np.where(error_data['filters'] == lsstFilter)
     xval = np.power(10., 0.4*(magnitudes - m5))
     error_rand = np.sqrt( (0.04-error_data['gamma'][matched])*xval+error_data['gamma'][matched]*xval*xval)
     magnitude_errors = np.sqrt(error_sys*error_sys+error_rand*error_rand)
@@ -1923,7 +1949,7 @@ if __name__ == "__main__":
                                             cursor=cursor, calsimtable=calsimtable,
                                             nstars=nstars_block, id_start=id_start,
                                             random_seed=random_seed, fluxNoise=fluxNoise, fluxFrac=fluxFrac,
-                                            filter=opsimfilter, errorDist=errorDist, systematicErr=systematicErr)
+                                            lsstFilter=opsimfilter, errorDist=errorDist, systematicErr=systematicErr)
 
     
     # End of looping over visits, printed everything out, we're done.
