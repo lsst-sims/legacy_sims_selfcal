@@ -6,7 +6,7 @@ import lsst.sims.maf.db as db
 lsstFilter = 'r'
 
 # Read in an Opsim database
-opsimDB = db.OpsimDatabase('sqlite:///opsimblitz2_1060_sqlite.db')
+opsimDB = db.OpsimDatabase('opsimblitz2_1060_sqlite.db')
 #ralim=np.array([0,360])*np.pi/180.
 #declim=np.array([0,-90])*np.pi/180.
 ralim=np.radians(np.array([40,60]) )
@@ -30,7 +30,7 @@ offsetList.append(offsets.OffsetSNR() )
 offsetList.append(offsets.OffsetClouds() )
 
 # Generate the catalog
-nobs, nstars = genCatalog(visits, 'sqlite:///msrgb_1e6.sqlite', offsets=offsetList,lsstFilter=lsstFilter)
+nobs, nstars = genCatalog(visits, 'msrgb_1e6.sqlite', offsets=offsetList,lsstFilter=lsstFilter)
 
 
 # Some simple timing tests.  Without Clouds turned on:
