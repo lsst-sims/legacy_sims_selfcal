@@ -1,3 +1,5 @@
+from __future__ import print_function
+from builtins import range
 #============================================================================
 #
 #               Library : Meteotools
@@ -53,7 +55,7 @@ def mkseg(tlims):
         while tcur < tend :
                 iupdown = -iupdown # switch current iupdown
                 #print 'iupdown = ',iupdown
-                print 'tcur = ',tcur
+                print('tcur = ',tcur)
                 idx = int( 1 + iupdown / 2. ) # idx is 0 (down) or 1 (up)
                 tsca = tlims[1][idx]
                 tlen = expovariate(1./tsca) # seg. length random expon
@@ -130,7 +132,7 @@ def mtssmooth(ttmtl):
 
 def sinexp(arg):
         nabs = arg[0]
-        tt=range(nabs)
+        tt=list(range(nabs))
         tlims = arg[1]
         tstep = (tlims[0][1]-tlims[0][0]) / nabs
         tt=array(tt) * tstep
@@ -162,7 +164,7 @@ def sinexp(arg):
 
 def sinexps(arg):
         nabs = arg[0]
-        tt=range(nabs)
+        tt=list(range(nabs))
         tlims = arg[1]
         tstep = (tlims[0][1]-tlims[0][0]) / nabs
         tt=array(tt) * tstep

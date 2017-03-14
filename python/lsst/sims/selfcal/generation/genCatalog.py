@@ -1,3 +1,5 @@
+from __future__ import print_function
+from builtins import zip
 import numpy as np
 import lsst.sims.maf.db as db
 from lsst.sims.selfcal.generation.starsTools import starsProject, assignPatches
@@ -34,7 +36,7 @@ def buildTree(simDataRa, simDataDec,
     if np.any(np.abs(simDataRa) > np.pi*2.0) or np.any(np.abs(simDataDec) > np.pi*2.0):
         raise ValueError('Expecting RA and Dec values to be in radians.')
     x, y, z = treexyz(simDataRa, simDataDec)
-    data = zip(x,y,z)
+    data = list(zip(x,y,z))
     if np.size(data) > 0:
         starTree = kdtree(data, leafsize=leafsize)
     else:
@@ -70,8 +72,8 @@ def genCatalog(visits, starsDbAddress, offsets=None, lsstFilter='r', raBlockSize
     ofile = open(obsFile, 'w')
     tfile = open(truthFile, 'w')
 
-    print >>ofile, '#PatchID, StarID, ObservedMag, MagUncertainty, Radius, HPID'
-    print >>tfile, '#StarID, TrueMag, ra, dec'
+    print('#PatchID, StarID, ObservedMag, MagUncertainty, Radius, HPID', file=ofile)
+    print('#StarID, TrueMag, ra, dec', file=tfile)
 
     # Set up connection to stars db:
     msrgbDB = db.Database(starsDbAddress, dbTables={'stars':['stars', 'id']})
@@ -128,24 +130,24 @@ def genCatalog(visits, starsDbAddress, offsets=None, lsstFilter='r', raBlockSize
                     # One side wrapped
                     else:
                         sqlwhere += 'and (ra > %f or ra < %f)'%(raMin,raMax)
-                print 'quering stars with: '+sqlwhere
+                print('quering stars with: '+sqlwhere)
                 stars = msrgbDB.tables['stars'].query_columns_Array(
                     colnames=starCols, constraint=sqlwhere)
-                print 'got %i stars'%stars.size
+                print('got %i stars'%stars.size)
                 # Add all the columns I will want here, then I only do
                 # one numpy stack per block rather than lots of stacks per visit
                 # Ugh, feels like writing fortran though...
                 newcols = ['x', 'y', 'radius', 'patchID', 'subPatch', 'hpID', 'hp1', 'hp2', 'hp3', 'hp4']
                 newtypes = [float, float, float, int,int, int]
-                stars = rfn.merge_arrays([stars, np.zeros(stars.size, dtype=zip(newcols,newtypes))],
+                stars = rfn.merge_arrays([stars, np.zeros(stars.size, dtype=list(zip(newcols,newtypes)))],
                                          flatten=True, usemask=False)
                 # Build a KDTree for the stars
                 starTree = buildTree(np.radians(stars['ra']),np.radians(stars['decl']) )
                 newIDs = np.in1d(stars['id'], idsUsed, invert=True, assume_unique=True)
                 newIDs = np.arange(stars['id'].size)[newIDs]
                 for newID in  newIDs:
-                    print >>tfile, '%i, %f, %f, %f'%(stars['id'][newID],stars['%smag'%lsstFilter][newID],
-                                                     stars['ra'][newID], stars['decl'][newID])
+                    print('%i, %f, %f, %f'%(stars['id'][newID],stars['%smag'%lsstFilter][newID],
+                                                     stars['ra'][newID], stars['decl'][newID]), file=tfile)
 
                 idsUsed.extend(stars['id'][newIDs].tolist())
 
@@ -167,7 +169,7 @@ def genCatalog(visits, starsDbAddress, offsets=None, lsstFilter='r', raBlockSize
                     dmags[offset.newkey] = offset.run(starsIn, visit, dmags=dmags)
 
                 # Total up all the dmag's to make the observed magnitude
-                keys = dmags.keys()
+                keys = list(dmags.keys())
                 obsMag = starsIn['%smag'%lsstFilter]
                 for key in keys:
                     obsMag += dmags[key]
@@ -179,9 +181,9 @@ def genCatalog(visits, starsDbAddress, offsets=None, lsstFilter='r', raBlockSize
 
                 # patchID, starID, observed Mag, mag uncertainty, radius, healpixIDs
                 for star,obsmag,magE in zip(starsIn,obsMag,magErr):
-                    print >>ofile, "%i, %i, %f, %f, %f, %i "%( \
+                    print("%i, %i, %f, %f, %f, %i "%( \
                         star['patchID'],star['id'], obsmag, magE,
-                        star['radius'], 0) #star['hpID'])
+                        star['radius'], 0), file=ofile) #star['hpID'])
 
                 # Note the new starID's and print those to a truth file
                 # starID true mag

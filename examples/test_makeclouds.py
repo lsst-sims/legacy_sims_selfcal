@@ -1,3 +1,4 @@
+from __future__ import print_function
 import numpy
 import pylab
 from lsst.sims.atmosphere.clouds.Clouds import Clouds
@@ -23,7 +24,7 @@ def make_clouds(sampling=240, seed=42):
     y = y / (numpy.max(y)/2.0) - 1.0   # probably need to change this.
     cloudxy = numpy.column_stack([numpy.ravel(x), numpy.ravel(y)])
     # Create an object we could use for interpolating cloud density at a point.
-    print numpy.shape(cloudxy), numpy.shape(numpy.ravel(cloudimage))
+    print(numpy.shape(cloudxy), numpy.shape(numpy.ravel(cloudimage)))
     cloud_interp = interpolate.NearestNDInterpolator(cloudxy, cloudimage.ravel())
     # and plot
     pylab.figure()
@@ -49,7 +50,7 @@ def make_clouds_Image(sampling=240, seed=42):
     y = y / (numpy.max(y)/2.0) - 1.0   # probably need to change this.
     cloudxy = numpy.column_stack([numpy.ravel(x), numpy.ravel(y)])
     # Create an object we could use for interpolating cloud density at a point. 
-    print numpy.shape(cloudxy), numpy.shape(numpy.ravel(cloudimage))
+    print(numpy.shape(cloudxy), numpy.shape(numpy.ravel(cloudimage)))
     cloud_interp = interpolate.NearestNDInterpolator(cloudxy, cloudimage.ravel())
     # and plot
     pylab.figure()
@@ -65,24 +66,24 @@ if __name__=="__main__":
     xy = numpy.array([[0.5, 0.5], [0.2, 0.3], [0.1, -.3]])
     cloud_interp = make_clouds(sampling, 42)
     c = cloud_interp(xy)
-    print c
+    print(c)
     cloud_interp = make_clouds(sampling, 43)
     c=  cloud_interp(xy)
-    print c
+    print(c)
     cloud_interp =make_clouds(sampling, 44)
     c=  cloud_interp(xy)
-    print c
+    print(c)
     # Clouds from 'image' method (think this is just substituting an image for the 
     #  calculated power spectrum???)
     xy = numpy.array([[0.5, 0.5], [0.2, 0.3], [0.1, -.3]])
     cloud_interp = make_clouds_Image(sampling, 42)
     c = cloud_interp(xy)
-    print c
+    print(c)
     cloud_interp = make_clouds_Image(sampling, 43)
     c=  cloud_interp(xy)
-    print c
+    print(c)
     cloud_interp =make_clouds_Image(sampling, 44)
     c=  cloud_interp(xy)
-    print c
+    print(c)
 
     pylab.show()

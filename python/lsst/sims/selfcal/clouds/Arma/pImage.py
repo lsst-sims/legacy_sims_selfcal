@@ -1,7 +1,9 @@
+from __future__ import print_function
+from builtins import object
 import numpy
 from scipy import fftpack
 
-class PImage():
+class PImage(object):
     def __init__(self, shift=True, nx=1000, ny=1000):
         """Init. Does nothing."""
         if (nx%2 != 0) | (ny%2 !=0):
@@ -279,7 +281,7 @@ class PImage():
         else:
             self.imageI = fftpack.ifft2(fimage)
         if self.imageI.imag.max() < 1e-14:
-            if verbose:  print "Inverse FFT created only small imaginary portion - discarding."
+            if verbose:  print("Inverse FFT created only small imaginary portion - discarding.")
             self.imageI = self.imageI.real
         return
 

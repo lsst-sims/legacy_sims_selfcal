@@ -9,6 +9,7 @@
 #
 #####
 
+from __future__ import print_function
 import sys
 import numpy as n
 import matplotlib
@@ -43,10 +44,10 @@ if len(sys.argv)>3:
     iteration_number = int(sys.argv[2])
     delta_chisq = float(sys.argv[3])
 
-print "Using %s as the true patch data file, and %s as the bestfit patch data file" \
-      %(truepatchfile, bestfitpatchfile)
+print("Using %s as the true patch data file, and %s as the bestfit patch data file" \
+      %(truepatchfile, bestfitpatchfile))
 
-print "also iteration number %d and delta_chisq %g" %(iteration_number, delta_chisq)
+print("also iteration number %d and delta_chisq %g" %(iteration_number, delta_chisq))
 
 # read the data files from disk
 patchdat = cp.read_true_patchfile(truepatchfile)
@@ -59,7 +60,7 @@ patchdat = cp.match_patch_calvstrue(patchdat, patchcal, sorted=True)
 patchdat = cp.adjust_patch_calvstrue(patchdat)
 if n.size(n.where(patchdat['patchid'] == 0)) !=0:
     good = n.where(patchdat['patchid'] == 0)
-    print 'Zeropoint from flux calibration stars = %f'%patchdat['magdiff'][good]
+    print('Zeropoint from flux calibration stars = %f'%patchdat['magdiff'][good])
 # plot the difference between the bestfit and true patch magnitudes
 maglim = None   # or set magnitude limit ranges 
 # or set magnitude limit ranges
@@ -70,14 +71,14 @@ ord=ord[0:len(ord)*.9]
 
 rms = patchdat['magdiff'][ord].std()
 
-print 'zp - fit RMS = %f, zp - fit (clipped) = %f'%(patchdat['magdiff'].std(), rms)
+print('zp - fit RMS = %f, zp - fit (clipped) = %f'%(patchdat['magdiff'].std(), rms))
 
 lim = (rms*2.5)
 if lim < 0.001:
     lim = round(lim * 10000) / 10000.0
 elif lim < 0.01:
     lim = round(lim * 1000) / 1000.0
-print "Using magnitude limits for plots of %f, %f" %(-lim, lim)
+print("Using magnitude limits for plots of %f, %f" %(-lim, lim))
 maglim= [-lim, lim]
 
 

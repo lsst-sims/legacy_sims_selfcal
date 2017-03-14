@@ -1,10 +1,15 @@
+from __future__ import print_function
+from __future__ import absolute_import
+from builtins import str
+from builtins import range
+from builtins import object
 import os
 import numpy
 from scipy import interpolate, fftpack
-from PowerSpectrum import PowerSpectrum
+from .PowerSpectrum import PowerSpectrum
 from pylab import rms_flat
 
-class Clouds:    
+class Clouds(object):    
     def __init__(self, ws, s):
         # set the half-diagonal size of the 2D Fourier space equal to the maximum frequency of the 1D power spectrum
         self.windowsize = ws/numpy.sqrt(2.)
@@ -72,7 +77,7 @@ class Clouds:
         ## correct for normalizations 
         if normfile == None:
             normfile = os.path.join(os.getenv('ATMOSPHERE_CLOUDS_DIR'), 'data/1104-batch1_im.txt')
-            print normfile
+            print(normfile)
         init_im = numpy.loadtxt(normfile)
         self.clouds = self.clouds/rms_flat(self.clouds)*rms_flat(init_im)
         ## will return an interpolation function next 

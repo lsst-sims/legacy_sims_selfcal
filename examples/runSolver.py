@@ -1,3 +1,5 @@
+from __future__ import print_function
+from builtins import zip
 from lsst.sims.selfcal.solver import lsqrSolver
 from lsst.sims.selfcal.utils import fastRead
 import numpy as np
@@ -21,8 +23,8 @@ mySolver.run()
 # now to compare the results!
 
 starsFit = np.load('solvedStar.npz')['result']
-trueStars = fastRead('starInfo.dat', dtype=zip(['starID','TrueMag', 'ra','dec'],
-                                               [int,float,float,float]),
+trueStars = fastRead('starInfo.dat', dtype=list(zip(['starID','TrueMag', 'ra','dec'],
+                                               [int,float,float,float])),
                                                delimiter=',')
 trueStars.sort(order='starID')
 
@@ -34,9 +36,9 @@ resid = starsFit['fitMag'] - trueStars['TrueMag']
 
 resid = resid-np.median(resid)
 
-print 'median fitMag - TrueMag = %f'%np.median(resid)
-print 'std (fitMag - TrueMag) = %f'%np.std(resid)
-print 'robust RMS = %f'%robustRMS(resid)
+print('median fitMag - TrueMag = %f'%np.median(resid))
+print('std (fitMag - TrueMag) = %f'%np.std(resid))
+print('robust RMS = %f'%robustRMS(resid))
 rrms = robustRMS(resid)
 
 plt.hist(resid, bins=100, range=(-4*rrms,4*rrms))

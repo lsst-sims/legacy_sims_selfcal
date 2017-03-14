@@ -1,3 +1,5 @@
+from __future__ import print_function
+from builtins import range
 import numpy as np
 import time 
 import pylab as pyl
@@ -16,13 +18,13 @@ def readDatafile(infilename, keys, dtype=None,
     try:
         f = open(infilename, 'r')
     except IOError:
-        print >>sys.stderr, "Couldn't open file %s" %(infilename)
-        print >>sys.stderr, "Returning None values"
+        print("Couldn't open file %s" %(infilename), file=sys.stderr)
+        print("Returning None values", file=sys.stderr)
         value = {}
         for i in keys:
             value[i] = None
         return value
-    print >>sys.stderr, "Reading file %s" %(infilename)
+    print("Reading file %s" %(infilename), file=sys.stderr)
     # Read data from file.
     value = {}
     for key in keys:
@@ -45,9 +47,9 @@ def readDatafile(infilename, keys, dtype=None,
                     try:
                         value[key].append(linevalues[j])
                     except IndexError:
-                        print "readDataFile failed at line %d, column %d, key=%s" \
-                              %(i, j+1, key)
-                        print "Data values: %s" %(linevalues)
+                        print("readDataFile failed at line %d, column %d, key=%s" \
+                              %(i, j+1, key))
+                        print("Data values: %s" %(linevalues))
                         raise IndexError
                     j = j+1
             sampleskip = 0
@@ -70,55 +72,55 @@ t1=time.time()
 patchfit=readDatafile('test_bestfit_Patch.dat', ['patchid','zp'] ,
                      dtype=[('patchid', '<i8'),  ('zp', '<f8')], skiprows=1)
 t2=time.time()
-print 'time to read patch', t2-t1
+print('time to read patch', t2-t1)
 t11=t1
 
 t1=time.time()
 starobs=readDatafile('star_obs.dat', ['patchid','starid','obsmag','magerr'] ,
                      dtype=[('patchid', '<i8'), ('starid', '<i8'), ('obsmag', '<f8'), ('magerr', '<f8')], skiprows=1)
 t2=time.time()
-print 'time to read starobs.dat', t2-t1
+print('time to read starobs.dat', t2-t1)
 
 t1=time.time()
 starobs=np.sort(starobs,order='patchid') #order by patch id
 #can try changing the sort type to look for speedup--nope, need to search for more, maybe parallel or pre-sort
 t2=time.time()
-print 'time to sort by patch id=', t2-t1
+print('time to sort by patch id=', t2-t1)
 
-print 'starting searchsorted left'
+print('starting searchsorted left')
 pl=np.searchsorted(starobs['patchid'], patchfit['patchid'])
-print 'starting search sorted right'
+print('starting search sorted right')
 pr=np.searchsorted(starobs['patchid'], patchfit['patchid'], side='right')
 #might need to do a trim patches from starobs
 
-print 'constructing zeropoint array'
+print('constructing zeropoint array')
 zparray=starobs['obsmag']*0
-for i in xrange(np.size(pl)):
+for i in range(np.size(pl)):
     if pl[i] != pr[i]:
         zparray[pl[i]:pr[i]]=zparray[pl[i]:pr[i]]+patchfit['zp'][i]
 
-print 'subtracting zeropoint array'
+print('subtracting zeropoint array')
 starobs['obsmag']=starobs['obsmag']-zparray
 
-print 'sorting by starid'
+print('sorting by starid')
 t1=time.time()
 starobs.sort(order='starid')
 t2=time.time()
-print 'time to sort by starid =',t2-t1
+print('time to sort by starid =',t2-t1)
 
 
 ids=np.unique(starobs['starid'])
 stds=np.zeros(np.size(ids))
-print 'starting searchsorted left'
+print('starting searchsorted left')
 left=np.searchsorted(starobs['starid'], ids)
-print 'starting search sorted right'
+print('starting search sorted right')
 right=np.searchsorted(starobs['starid'], ids,'right')
 
-print 'computing stdev for each star'
-for i in xrange(np.size(ids)):
+print('computing stdev for each star')
+for i in range(np.size(ids)):
     stds[i]=starobs['obsmag'][left[i]:right[i]].std()
 
-print 'median RMS per star', np.median(stds)
+print('median RMS per star', np.median(stds))
 
 pyl.figure()
 num,bins,patches = pyl.hist(stds*1000,bins=50)
@@ -131,7 +133,7 @@ pyl.title('Repeatability: Median=%.1f mmag'
 pyl.savefig('rmsperstar.png', format='png')
 
 t2=time.time()
-print 'total runtime = %.2f min'%((t11-t2)/60)
+print('total runtime = %.2f min'%((t11-t2)/60))
 
 
 #now to import pylab and make the histogram

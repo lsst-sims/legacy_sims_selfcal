@@ -1,3 +1,6 @@
+from builtins import str
+from builtins import zip
+from builtins import range
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import os
@@ -56,7 +59,7 @@ def scale(data):
 
 def dictCut(dictionary, cut):
     """Apply a cut to all the dictionary items"""
-    for name, arr in dictionary.items():
+    for name, arr in list(dictionary.items()):
         dictionary[name] = arr[cut]
 
 
@@ -89,7 +92,7 @@ def select_daily_values(wl, ambin):
     mjd_avg = []
     data_avg = []
     mis_vals = []
-    for d in xrange(N_DAYS):
+    for d in range(N_DAYS):
         daily_values = np.where(mjd_int == d)[0]
         if daily_values.shape[0]:
             data = laer_dict[wl][ambin]
@@ -126,7 +129,7 @@ def average_n_variance(tdict):
     idx = tdict['mjd_avg'] % YLEN
     data_yavg = np.zeros(YLEN)
     data_ystd = np.zeros(YLEN)
-    for d in xrange(YLEN):
+    for d in range(YLEN):
         dvals = tdict['laer_avg'][np.where(idx == d)]
         davg = np.mean(dvals)
         data_yavg[d] = davg
@@ -256,7 +259,7 @@ def covariance(vector):
     avgvect = vector.mean(axis=1)
     sqavg = np.outer(avgvect, np.conj(avgvect))
     bigmatrix = np.zeros((npar, npar, nfreq), dtype='complex')
-    for freq in xrange(nfreq):
+    for freq in range(nfreq):
         bigmatrix[:, :, freq] = np.outer(vector[:, freq], np.conj(vector[:, freq]))
     avgsq = bigmatrix.mean(axis=2)
     covmatrix = avgsq - sqavg
@@ -302,9 +305,9 @@ def main(seed=10):
     # print 'Eigenvectors:\n', eigenvectors
     npr.seed(seed)
     sprseed = npr.randint(0, 100000, nfreq)
-    for freq in xrange(nfreq):
+    for freq in range(nfreq):
         master_rand[:, freq] = randomize(eigenvalues, eigenvectors, sprseed[freq])
-    for par in xrange(npar):
+    for par in range(npar):
         master_out[par] = npf.irfft(master_rand[par])
     out_dict = vector2dict(master_out, log=True)
     return out_dict
@@ -332,7 +335,7 @@ def getAerParameters(seed=10, airmass='0'):
     tmpfile.write(strhead)
     # initialize vector for fitting parameters
     fitvect = np.zeros((N_DAYS - 1, 4))
-    for day in xrange(N_DAYS - 1):
+    for day in range(N_DAYS - 1):
         lvect = outvect[day]
         # Fit
         pfit = np.polyfit(laer_wl, lvect, P_DEG)
@@ -467,7 +470,7 @@ dmjd_cut = np.where(dmjd != 0.0)
 # Main parameters dictionary
 mainstr = ['mjd', 'mjdy', 'airmass', 'ang', 'fmf']
 mainlist = [mjd, mjdy, airmass, ang_e, fmf]
-maindict = dict(zip(mainstr, mainlist))
+maindict = dict(list(zip(mainstr, mainlist)))
 
 # Optical depth wavelengths
 aerstr = ['380', '440', '500', '675', '870']
@@ -478,7 +481,7 @@ saerlist = [scale(aer) for aer in aerlist]
 # convert to log
 laerlist = [np.log(aer) for aer in saerlist]
 # put in a dictionary
-laer_masterdict = dict(zip(aerstr, laerlist))
+laer_masterdict = dict(list(zip(aerstr, laerlist)))
 # wavelength in log
 laer_wl = np.array([np.log(int(aer)) for aer in aerstr], dtype='float')
 

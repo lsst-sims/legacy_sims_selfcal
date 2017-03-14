@@ -1,9 +1,11 @@
+from __future__ import print_function
+from __future__ import absolute_import
 import numpy
 import pylab
 from scipy import fftpack
 # For plotting an image in log scale
 from matplotlib.colors import LogNorm
-from pImage import PImage
+from .pImage import PImage
 
 class PImagePlots(PImage):
     """Inherits from PImage, which does all the 'math' work, but adds plotting capabilities.
@@ -147,7 +149,7 @@ class PImagePlots(PImage):
             norml = LogNorm()
             if clims!=None:
                 if (clims[0] <0) | (clims[1]<0):
-                    print 'Using a log scale and clims < 0 does not work ...'
+                    print('Using a log scale and clims < 0 does not work ...')
                 norml = LogNorm(vmin=clims[0], vmax=clims[1])
         else:
             from matplotlib.colors import Normalize
@@ -185,7 +187,7 @@ class PImagePlots(PImage):
             norml = LogNorm()
             if clims!=None:
                 if (clims[0] <0) | (clims[1]<0):
-                    print 'Using a log scale and clims < 0 does not work ...'
+                    print('Using a log scale and clims < 0 does not work ...')
                 norml = LogNorm(vmin=clims[0], vmax=clims[1])
         else:
             from matplotlib.colors import Normalize

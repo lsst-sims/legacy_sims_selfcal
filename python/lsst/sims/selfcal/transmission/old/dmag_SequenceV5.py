@@ -1,3 +1,6 @@
+from __future__ import print_function
+from builtins import str
+from builtins import range
 #"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 #"""                                                                   """
 #"""                        Dmag_sequenceV5-multiref.py :                         """
@@ -162,8 +165,8 @@ for ibl in range(0,blknum):
     bloname = specpath + expname + 'csp' + str(ibl+1)+'.dat'
     trsp = open(bloname,'r')
     lignes = list(trsp)
-    if len(lignes) <> nsbin :
-        print '***** number of bins mismatch*****'
+    if len(lignes) != nsbin :
+        print('***** number of bins mismatch*****')
     # convert charline data spectrum to numerical array spectrum
     ali = []
     for lila in lignes:

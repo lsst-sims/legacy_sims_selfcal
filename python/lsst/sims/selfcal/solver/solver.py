@@ -1,3 +1,6 @@
+from builtins import zip
+from builtins import range
+from builtins import object
 import numpy as np
 from scipy.sparse import coo_matrix
 from scipy.sparse.linalg import lsqr
@@ -36,7 +39,7 @@ class lsqrSolver(object):
     def readData(self):
         names = ['patchID', 'starID', 'mag', 'magErr', 'radius', 'hpID']
         types = [int,int,float,float,float,int]
-        self.observations = fastRead(self.infile, dtype=zip(names,types), delimiter=',')
+        self.observations = fastRead(self.infile, dtype=list(zip(names,types)), delimiter=',')
 
     def cleanData(self):
         """
@@ -106,12 +109,12 @@ class lsqrSolver(object):
 
     def writeSoln(self):
 
-        result = np.empty(self.Patches.size, dtype=zip(['patchID','zp'],[int,float]) )
+        result = np.empty(self.Patches.size, dtype=list(zip(['patchID','zp'],[int,float])) )
         result['patchID'] = self.Patches
         result['zp'] = self.solution[0][0:self.nPatches]
         np.savez(self.patchOut, result=result)
 
-        result = np.empty(self.Stars.size, dtype=zip(['starID','fitMag'],[int,float]) )
+        result = np.empty(self.Stars.size, dtype=list(zip(['starID','fitMag'],[int,float])) )
         result['starID'] = self.Stars
         result['fitMag'] = self.solution[0][self.nPatches:]
         np.savez(self.starOut, result=result )

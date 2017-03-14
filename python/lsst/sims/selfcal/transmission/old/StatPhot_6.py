@@ -24,6 +24,9 @@
 #       which allows to activate a selection of low airmass cases
 #------------------------------------------------------------
 #
+from __future__ import print_function
+from builtins import str
+from builtins import range
 import numpy
 import pylab
 import Astrotools
@@ -198,7 +201,7 @@ phot = [[0.]*ndat]*nruns
 ident = [('')]*nruns
 for line in lphp[1:] :
     fldat = []
-    if line[:12].strip()<> 'Reference': # exlude reference lines from data
+    if line[:12].strip()!= 'Reference': # exlude reference lines from data
         irun = irun + 1
         ldat = line[14:-2].split()
         for ii in range(0,len(ldat)):
@@ -216,8 +219,8 @@ fpar = open(parmfile,'r')
 lparl = list(fpar)
 fpar.close()
 nparun = len(lparl)
-if nparun <> len(ident):
-    print '***WARNING*** lengthes of parmlist and photlist missmatch'
+if nparun != len(ident):
+    print('***WARNING*** lengthes of parmlist and photlist missmatch')
 
 # names of parms to be extracted
 parnaml = ['expMJD', 'ZANGLE','MODEL','O3','H2O','ISEAS','ICLD','VIS']
@@ -229,9 +232,9 @@ irun=-1
 for line in lparl :
     irun = irun + 1
     parid = line.split('$')[0].strip()
-    if parid <> ident[irun]:
-        print '***WARNING*** in trouble with identifiers'\
-              , irun ,' parid ',parid,' ident ',ident
+    if parid != ident[irun]:
+        print('***WARNING*** in trouble with identifiers'\
+              , irun ,' parid ',parid,' ident ',ident)
     lrpar = line.split('$')
     for ipa in range(0,nparm):
         parname = parnaml[ipa]

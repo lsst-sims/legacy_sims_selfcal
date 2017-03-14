@@ -1,3 +1,5 @@
+from __future__ import print_function
+from builtins import range
 ######
 # Lynne Jones, ljones@astro.washington.edu
 #   8/2010
@@ -102,16 +104,16 @@ def make_histogram(filename, columns, bin_numbers=None, file_lineskip=1, titles=
         stats[c]['hist_min'] = n[c].min()
         stats[c]['hist_max'] = n[c].max()
         stats[c]['hist_ave'] = n[c].sum() / float(len(n[c]))
-    print ""
+    print("")
     writestring = "# column "
     for key in statlist:
         writestring = writestring + " %s " %(key)
-    print writestring
+    print(writestring)
     for c in columns:
         writestring = "c %d " %(c)
         for key in statlist:
             writestring = writestring + "%g " %(stats[c][key])
-        print writestring
+        print(writestring)
     return data, stats
 
 def make_2d_scatterhist(filename, columns, bin_numbers=None, file_lineskip=1, titles=None, xlabels=None, savefig=False):
@@ -221,16 +223,16 @@ def make_2d_scatterhist(filename, columns, bin_numbers=None, file_lineskip=1, ti
         stats[c]['hist_min'] = n[c].min()
         stats[c]['hist_max'] = n[c].max()
         stats[c]['hist_ave'] = n[c].sum() / float(len(n[c]))
-    print ""
+    print("")
     writestring = "# column "
     for key in statlist:
         writestring = writestring + " %s " %(key)
-    print writestring
+    print(writestring)
     for c in columns:
         writestring = "c %d " %(c)
         for key in statlist:
             writestring = writestring + "%g " %(stats[c][key])
-        print writestring
+        print(writestring)
     return data, stats
 
 #########copy above routine and but in 2d plot.
@@ -313,22 +315,22 @@ def make_histogram_predef(filename, columns, bin_ranges, bin_numbers, file_lines
     f.close()
     # Print some basic output.
     for c in columns:
-        print "# For column ", c, " used ", len(histovals[c]), " bins."
-        print "# And ", histovals[c].sum(), " values from the data file."
+        print("# For column ", c, " used ", len(histovals[c]), " bins.")
+        print("# And ", histovals[c].sum(), " values from the data file.")
         stats[c]['data_ave'] = stats[c]['data_ave'] / histovals[c].sum()
         stats[c]['hist_min'] = histovals[c].min()
         stats[c]['hist_max'] = histovals[c].max()
         stats[c]['hist_ave'] = histovals[c].sum() / float(len(histovals[c]))
-    print ""
+    print("")
     writestring = "# column "
     for key in statlist:
         writestring = writestring + " %s " %(key)
-    print writestring
+    print(writestring)
     for c in columns:
         writestring = "c %d " %(c)
         for key in statlist:
             writestring = writestring + "%g " %(stats[c][key])
-        print writestring            
+        print(writestring)            
     # Make histogram plots.
     i = 0
     for c in columns:
@@ -500,22 +502,22 @@ if __name__ == "__main__":
                 raise Exception("titles can be either length 1 or the length of 'columns'")
 
     # Send some feedback about usage.
-    print "# Will reading from file ", filename
+    print("# Will reading from file ", filename)
     if use_predef:
-        print "# Using predefined histogram bins / predef routine for creating histogram."
+        print("# Using predefined histogram bins / predef routine for creating histogram.")
     else:
-        print "# Not using predefined histogram bins / pylab version for creating histogram."
-    print "# Creating histograms from columns ", columns
+        print("# Not using predefined histogram bins / pylab version for creating histogram.")
+    print("# Creating histograms from columns ", columns)
     if num_histbins != None:
-        print "# Using ", num_histbins, " numbers for the histogram bins."
+        print("# Using ", num_histbins, " numbers for the histogram bins.")
     if range_histbins != None:
-        print "# Using ", range_histbins, " for the histogram bin ranges."
+        print("# Using ", range_histbins, " for the histogram bin ranges.")
     if xlabels != None:
-        print "# Using ", xlabels, " for the histogram x labels."
+        print("# Using ", xlabels, " for the histogram x labels.")
     if titles != None:
-        print "# Using ", titles, " for the histogram titles."
+        print("# Using ", titles, " for the histogram titles.")
     if do2d:
-        print "# Going to create a 2-d scatter plot with histograms."
+        print("# Going to create a 2-d scatter plot with histograms.")
 
     # Read data and make histograms.
     if not use_predef:

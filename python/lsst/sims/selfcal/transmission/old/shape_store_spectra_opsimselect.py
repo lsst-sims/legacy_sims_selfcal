@@ -1,3 +1,5 @@
+from builtins import str
+from builtins import range
 #"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 #"""                                                                   """
 #"""                shape_store_spectra.py                                                   """
@@ -80,7 +82,7 @@ blocksize = 1000
 nblock = 0
 for i in range(0,nlines):        #
     lf = transpec[i]
-    if lf[7]<>'$':  # no $ in column 8 means new wavelength next
+    if lf[7]!='$':  # no $ in column 8 means new wavelength next
         i1=i1+1
         if i2== 1:
             # store wavelengthes, reference spectrum and first spectrum

@@ -14,11 +14,14 @@ The structure function is not generated here - any function which is described i
  extinction minipapers, uploaded to confluence http://www.lsstcorp.org:8090/display/CAL/Cloud+Simulation+Documentation ).
 
 """
+from __future__ import print_function
+from __future__ import absolute_import
+from builtins import object
 
 import numpy
-from pImage import PImage
+from .pImage import PImage
 
-class Clouds():
+class Clouds(object):
     def __init__(self):
         return
 
@@ -73,22 +76,22 @@ class Clouds():
         im = PImage(shift=True, nx=self.imsize, ny=self.imsize)
         im.makeImageFromSf(sfx=SFx, sf=SFsf)
         if verbose:
-            print 'Image: fov', self.final_fov, 'Imsize (Final)', self.final_imsize, 'Imsize (oversampled)', self.imsize, 'Pixscale', self.dpixscale, \
-                'deg/pix', '(', self.pixscale, 'arcsec/pix)'
+            print('Image: fov', self.final_fov, 'Imsize (Final)', self.final_imsize, 'Imsize (oversampled)', self.imsize, 'Pixscale', self.dpixscale, \
+                'deg/pix', '(', self.pixscale, 'arcsec/pix)')
         # Trim image to desired final size (in case of oversampling earlier in setupCloudImage()). 
         trim = round(self.imsize - self.final_imsize)/2.0
         self.cloudimage = im.imageI.real[trim:trim+self.final_imsize, trim:trim+self.final_imsize]
         # Rescale image to have proper mean extinction and variation in cloud extinction. 
         self.rescaleImage(rms_goal, kappa, verbose=verbose)
         if verbose:
-            print 'Image: fov', self.final_fov, 'Imsize', self.final_imsize, 'Pixscale', self.dpixscale, \
-                'deg/pix', '(', self.pixscale, 'arcsec/pix)'
+            print('Image: fov', self.final_fov, 'Imsize', self.final_imsize, 'Pixscale', self.dpixscale, \
+                'deg/pix', '(', self.pixscale, 'arcsec/pix)')
         return
             
     def rescaleImage(self, sigma_goal, kappa, verbose=False):
         """Rescale a reconstructed image to have the desired variation and overall opacity."""
         if verbose:
-            print '# Before rescaling:'
+            print('# Before rescaling:')
             self._cloudStats()
         # Subtract mean, multiply by new stdev, then add new mean opacity.
         self.cloudimage = self.cloudimage - self.cloudimage.mean()
@@ -97,18 +100,18 @@ class Clouds():
         # Make sure no 'negative' clouds 
         self.cloudimage = numpy.where(self.cloudimage<0, 0, self.cloudimage)
         if verbose:
-            print '# After rescaling:'
+            print('# After rescaling:')
             self._cloudStats()
         return 
 
     def _cloudStats(self):
-        print '# CloudImage: mean/sigma/min/max:', self.cloudimage.std(), self.cloudimage.mean(), \
-            self.cloudimage.min(), self.cloudimage.max()
+        print('# CloudImage: mean/sigma/min/max:', self.cloudimage.std(), self.cloudimage.mean(), \
+            self.cloudimage.min(), self.cloudimage.max())
         return
 
     def plotCloudImage(self):
         """Generate some additional information and plots about the cloud image, if desired."""
-        from pImagePlots import PImagePlots
+        from .pImagePlots import PImagePlots
         import pylab
         im = PImagePlots()
         im.setImage(self.cloudimage)

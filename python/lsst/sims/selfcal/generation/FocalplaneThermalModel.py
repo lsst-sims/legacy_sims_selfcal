@@ -1,10 +1,12 @@
+from __future__ import print_function
+from builtins import object
 import numpy as np
 import scipy.interpolate as interp
 
 """
 A Raft consists of a set of Detectors, each with a thermal model
 """
-class FocalplaneThermalModel:
+class FocalplaneThermalModel(object):
     def __init__(self, focalPlaneDatafile):
         self.rafts = {}
         """For each line in focalPlaneDatafile, add the corresponding raft"""
@@ -17,18 +19,18 @@ class FocalplaneThermalModel:
             self.addRaft(raftName, raftDataFile, raftOffset)
                 
     def addRaft(self, raftName, raftDataFile, raftOffset):
-        print 'adding raft %s %s %f\n' % (raftName, raftDataFile, raftOffset)
+        print('adding raft %s %s %f\n' % (raftName, raftDataFile, raftOffset))
         self.rafts[raftName] = RaftThermalModel(raftName, raftDataFile, raftOffset)
 
     def getTemp(self, raftName, detectorName, x, y):
-        if (self.rafts.has_key(raftName)):
+        if (raftName in self.rafts):
             raft = self.rafts[raftName]
             return raft.getTemp(detectorName, x, y)
         else:
             return None
         
             
-class RaftThermalModel:
+class RaftThermalModel(object):
     def __init__(self, raftName, raftDataFile, raftOffset, detectorShape=(4000, 4072)):
         self.raftName = raftName
         self.raftOffset = raftOffset
@@ -50,7 +52,7 @@ class RaftThermalModel:
         Given a detectorName and (x,y) coord, return the temp
         """
  
-        if (self.detectors.has_key(detectorName)):
+        if (detectorName in self.detectors):
             return self.detectors[detectorName].getTemp(x, y)
         else:
             return None
@@ -62,7 +64,7 @@ class RaftThermalModel:
         temps = ()
         for coord in coordList:
             (detectorName, x, y) = coord
-            if (self.detectors.has_key(detectorName)):
+            if (detectorName in self.detectors):
                 temps.append(self.detectors[detectorName].getTemp(x, y))
             else:
                 temps.append(None)
@@ -73,7 +75,7 @@ class RaftThermalModel:
 A DetectorThermalModel is specified by a file with temperature points on a regularly spaced
    grid
 """
-class DetectorThermalModel:
+class DetectorThermalModel(object):
     def __init__(self, shape, dataFile, offset):
         self.shape = shape
         self.offset = offset

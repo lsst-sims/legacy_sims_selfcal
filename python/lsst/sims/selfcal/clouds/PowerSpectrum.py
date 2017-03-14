@@ -1,8 +1,11 @@
+from builtins import str
+from builtins import range
+from builtins import object
 import os
 import numpy
 from scipy import interpolate, fftpack
 
-class PowerSpectrum:
+class PowerSpectrum(object):
     
     def __init__(self, ws, s):
         """Instantiate the PowerSpectrum object to hold the structure function for cloud variance.

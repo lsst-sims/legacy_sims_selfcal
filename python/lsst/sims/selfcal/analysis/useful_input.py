@@ -1,3 +1,5 @@
+from __future__ import print_function
+from builtins import range
 #####
 #  Lynne Jones, ljones@astro.washington.edu.
 #  svn version info : $Id$
@@ -61,13 +63,13 @@ def readDatafile(infilename, keys, keytypes=None,
     try:
         f = open(infilename, 'r')
     except IOError:
-        print >>sys.stderr, "Couldn't open file %s" %(infilename)
-        print >>sys.stderr, "Returning None values"
+        print("Couldn't open file %s" %(infilename), file=sys.stderr)
+        print("Returning None values", file=sys.stderr)
         value = {}
         for i in keys:
             value[i] = None
         return value
-    print >>sys.stderr, "Reading file %s" %(infilename)
+    print("Reading file %s" %(infilename), file=sys.stderr)
     # Read data from file.
     value = {}
     for key in keys:
@@ -90,9 +92,9 @@ def readDatafile(infilename, keys, keytypes=None,
                     try:
                         value[key].append(linevalues[j])
                     except IndexError:
-                        print "readDataFile failed at line %d, column %d, key=%s" \
-                              %(i, j+1, key)
-                        print "Data values: %s" %(linevalues)
+                        print("readDataFile failed at line %d, column %d, key=%s" \
+                              %(i, j+1, key))
+                        print("Data values: %s" %(linevalues))
                         raise IndexError
                     j = j+1
             sampleskip = 0
@@ -114,20 +116,20 @@ def writeDatafile(outfilename, data, keys, printheader=True, newfile=True):
         try:
             fout = open(outfilename, 'w')
         except IOError:
-            print >>sys.stderr, "Couldn't open file %s" %(outfilename)
+            print("Couldn't open file %s" %(outfilename), file=sys.stderr)
             return
     else:
         try:
             fout = open(outfilename, 'a')
         except IOError:
-            print >>sys.stderr, "Couldn't open file %s" %(outfilename)
+            print("Couldn't open file %s" %(outfilename), file=sys.stderr)
             return
     # Print header information if desired.
     if printheader: 
         writestring = "# "
         for key in keys:
             writestring = writestring + " " +  key
-        print >>fout, writestring
+        print(writestring, file=fout)
     # Print data information.
     datatype = {}
     for key in keys:
@@ -139,7 +141,7 @@ def writeDatafile(outfilename, data, keys, printheader=True, newfile=True):
             datatype[key] = 'str'
         else:
             datatype[key] = 'unknown'
-            print >>sys.stderr, "Couldn't determine data type of values with %s key; will skip in output" %(key)
+            print("Couldn't determine data type of values with %s key; will skip in output" %(key), file=sys.stderr)
     for i in range(len(data[keys[0]])):
         writestring = ""
         for key in keys:
@@ -150,6 +152,6 @@ def writeDatafile(outfilename, data, keys, printheader=True, newfile=True):
             elif datatype[key] == 'int':
                 writestring = writestring + " %d" %(data[key][i])
         # Done constructing write line.
-        print >>fout, writestring
+        print(writestring, file=fout)
     # Done writing data.
     fout.close()

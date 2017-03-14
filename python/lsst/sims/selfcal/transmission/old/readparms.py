@@ -1,3 +1,5 @@
+from __future__ import print_function
+from builtins import range
 # read a catalogue of MODTRAN parameters with their
 #  name, format, card sequential number, range in card
 # return a list with parameters attributes
@@ -15,7 +17,7 @@ def rdp(parmfile):
         for data in parmf:
                 i1 = i1+1
                 parmlis = parmlis + [data]#one string per parameter
-                print i1 , parmlis[i1]
+                print(i1 , parmlis[i1])
         parmf.close()
         plist =[]
         for iparm in range(0,len(parmlis)):

@@ -30,12 +30,17 @@ function of the Atmosphere class
 - seed implemented for the simulations
 - bug fixes
 """
+from __future__ import print_function
+from __future__ import absolute_import
+from builtins import zip
+from builtins import range
+from builtins import object
 
 import numpy as np
 import os
 
-import modtranAtmos
-import modtranTools
+from . import modtranAtmos
+from . import modtranTools
 
 rad2dec = 180. / np.pi
 deg2rad = 1./rad2dec
@@ -93,12 +98,12 @@ class AtmosphereSequence(object):
             with open(opsimfile, 'r') as opsim:
                 for visit in opsim:
                     if visit.startswith('o'):
-                        print visit
+                        print(visit)
                         continue
                     data = visit.strip().split()
                     visitDict = {}
                     visitDict[_opsim_keys[0]] = int(data[0])
-                    for i in xrange(1, len(data)):
+                    for i in range(1, len(data)):
                         visitDict[_opsim_keys[i]] = float(data[i])
                     self.opsim_visits.append(visitDict)
             self._initialized_visits = True
@@ -165,7 +170,7 @@ class AtmosphereSequence(object):
             self.mjds, self.mjde, self.npoints, seed)
         self.atmos.init_main_parameters()
         for opsim_dict, idx in zip(self.opsim_visits,
-                                   xrange(len(self.opsim_visits))):
+                                   range(len(self.opsim_visits))):
             modtran_dict = self.fillModtranDictionary(opsim_dict, idx)
             self.modtran_visits.append(modtran_dict)
 

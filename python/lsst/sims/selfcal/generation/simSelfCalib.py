@@ -1,3 +1,6 @@
+from __future__ import print_function
+from builtins import zip
+from builtins import range
 ####################################################################
 #  Written by: Lynne Jones - UW - v1.1 5/21/10
 #  Questions or comments, email : ljones@astro.washington.edu
@@ -41,7 +44,7 @@
 # patch.
 
 # general python modules
-print 'importing general modules'
+print('importing general modules')
 import numpy as np
 import numpy.random as random
 import time
@@ -311,13 +314,13 @@ def process_illumcorr(filename):
     except IOError:
         raise IOError
 
-    print "illumcorrInterp"
+    print("illumcorrInterp")
 
     interpFunc = interp1d(icdat[:,0], icdat[:,1], bounds_error=False, fill_value=0)
 
     illumcorrFunc.illumcorrInterp = interpFunc
     
-    print "done with process_illumcorr"
+    print("done with process_illumcorr")
 
     return
     
@@ -434,7 +437,7 @@ def readParameters(parameter_filename):
     
     # Open the parameter file and read inputs (to override values above, if given). 
     if (parameter_filename == "NULL"):
-        print "No parameter file given, going with the defaults"
+        print("No parameter file given, going with the defaults")
         return (raMin, raMax, decMin, decMax, use_opsim, use_opsimdither, opsimfilter,
                 use_calsim, calsimtable, dbOut,
                 radius_fov, nPatch, nEpoch, tstart, tstop,
@@ -453,7 +456,7 @@ def readParameters(parameter_filename):
     try:
         parfile = open(parameter_filename, 'r')
     except IOError:
-        print "Could not open parameter file %s, going with defaults" %(parameter_filename)
+        print("Could not open parameter file %s, going with defaults" %(parameter_filename))
         return (raMin, raMax, decMin, decMax, use_opsim, use_opsimdither, opsimfilter, 
                 use_calsim, calsimtable, dbOut,
                 radius_fov, nPatch, nEpoch, tstart, tstop,
@@ -504,7 +507,7 @@ def readParameters(parameter_filename):
             elif (calcerror=="FALSE") | (calcerror=="false") | (calcerror=="False") | (calcerror=="no"):
                 calcerror = False
             else :
-                print "Sorry I don't recognize that value for calcerror - please try True or False"
+                print("Sorry I don't recognize that value for calcerror - please try True or False")
                 exit()      
         elif keyword == "zp_var_max":
             zp_var_max = float(value)
@@ -536,7 +539,7 @@ def readParameters(parameter_filename):
             elif (use_cloudsimage=="FALSE") | (use_cloudsimage=="false") | (use_cloudsimage=="False") | (use_cloudsimage=="no"):
                 use_cloudsimage = False
             else :
-                print "Sorry I don't recognize that value for use_cloudsimage - please try True or False"
+                print("Sorry I don't recognize that value for use_cloudsimage - please try True or False")
                 exit()                  
         elif keyword == "cloud_scale":
             cloud_scale = float(value)
@@ -583,7 +586,7 @@ def readParameters(parameter_filename):
             elif (kepler_variability=="FALSE") | (kepler_variability=="false") | (kepler_variability=="False") | (kepler_variability=="no"):
                 kepler_variability = False
             else :
-                print "Sorry I don't recognize that value for kepler_variability - please try True or False"
+                print("Sorry I don't recognize that value for kepler_variability - please try True or False")
                 exit()            
         elif keyword == "raMin":
             raMin = float(value)
@@ -601,7 +604,7 @@ def readParameters(parameter_filename):
             elif (use_opsim=="FALSE") | (use_opsim=="false") | (use_opsim=="False") | (use_opsim=="no"):
                 use_opsim = False
             else :
-                print "Sorry I don't recognize that value for use_opsim - please try True or False"
+                print("Sorry I don't recognize that value for use_opsim - please try True or False")
                 exit()
         elif keyword == "use_opsimdither":
             use_opsimdither = value
@@ -617,7 +620,7 @@ def readParameters(parameter_filename):
                 (opsimfilter=="i") | (opsimfilter=="z") | (opsimfilter=="y")):
                 pass
             else:
-                print "Sorry, I don't recognize that filter choice for opsim: please try u g r i z or y"
+                print("Sorry, I don't recognize that filter choice for opsim: please try u g r i z or y")
                 exit()
         elif keyword == "use_calsim" : 
             use_calsim = value
@@ -628,7 +631,7 @@ def readParameters(parameter_filename):
                   | (use_calsim=="no")):
                 use_calsim = False
             else :
-                print "Sorry I don't recognize that value for use_calsim - please try True or False"
+                print("Sorry I don't recognize that value for use_calsim - please try True or False")
                 exit()
         elif keyword == "calsimtable":
             calsimtable = value
@@ -640,7 +643,7 @@ def readParameters(parameter_filename):
             elif (dbOut=="FALSE") | (dbOut=="false") | (dbOut=="False") | (dbOut=="no"):
                 dbOut = False
             else :
-                print "Sorry I don't recognize that value for dbOut - please try True or False"
+                print("Sorry I don't recognize that value for dbOut - please try True or False")
                 exit()      
         elif keyword == "tstart":
             tstart = float(value)
@@ -653,9 +656,9 @@ def readParameters(parameter_filename):
         elif keyword == "nPatch":
             nPatch = int(value)
             pside = int(np.sqrt(nPatch))
-            print " nPatch implies %d x %d grid on field of view" %(pside, pside)
+            print(" nPatch implies %d x %d grid on field of view" %(pside, pside))
             if (np.abs(pside*pside  - nPatch) > 0.1):
-                print " Please make input nPatch a square number (i.e. 16, as 16=4x4) to remove ambiguity"
+                print(" Please make input nPatch a square number (i.e. 16, as 16=4x4) to remove ambiguity")
                 exit()
         elif keyword == "dith_raOff_frac":
             dith_raOff_frac = float(value)
@@ -674,7 +677,7 @@ def readParameters(parameter_filename):
             elif (print_subpatch=="FALSE") | (print_subpatch=="false") | (print_subpatch=="False") | (print_subpatch=="no"):
                 print_subpatch = False
             else :
-                print "Sorry I don't recognize that value for print_subpatch - please try True or False"
+                print("Sorry I don't recognize that value for print_subpatch - please try True or False")
                 exit()      
         elif keyword == "master_filename":
             master_filename = value
@@ -697,7 +700,7 @@ def readParameters(parameter_filename):
         elif keyword == "fpTempTimescale":
             fpTempTimescale = float(value)
         else:
-            print value, " Sorry I don't recognize that keyword. Please check the code or example input file."
+            print(value, " Sorry I don't recognize that keyword. Please check the code or example input file.")
             exit()
     # Done reading information from parameter file.
     parfile.close()
@@ -717,30 +720,30 @@ def readParameters(parameter_filename):
         tstop = tstart
         tstart = junk
     if use_opsim==True:
-        print "Using opsim to generate visits, with filter choice of %s" %(opsimfilter)
+        print("Using opsim to generate visits, with filter choice of %s" %(opsimfilter))
         if use_opsimdither==True:
-            print "  and using opsim's hex dither pattern." 
+            print("  and using opsim's hex dither pattern.") 
         if (tstart == tstop):
-            print "You want to use the opsim to generate visits, but tstart = tstop. Please fix."
+            print("You want to use the opsim to generate visits, but tstart = tstop. Please fix.")
             exit()
     if use_opsim==False:
-        print "Using the regular grid to generate %d visits to each pointing in the grid" %(nEpoch)
+        print("Using the regular grid to generate %d visits to each pointing in the grid" %(nEpoch))
         if nEpoch == 0:
-            print "You want to generate visits without opsim, but the number of repeat visits is 0. "
-            print "Please fix this problem in the input file." 
+            print("You want to generate visits without opsim, but the number of repeat visits is 0. ")
+            print("Please fix this problem in the input file.") 
             exit()
     if use_calsim==True:
-        print "Using calibration database %s.%s on %s to generate stars." %(calsimdb,
-                                                                            calsimtable, calsimhost)
+        print("Using calibration database %s.%s on %s to generate stars." %(calsimdb,
+                                                                            calsimtable, calsimhost))
     else:
-        print "Using a flat random distribution of %d stars. " %(nStarTot)
+        print("Using a flat random distribution of %d stars. " %(nStarTot))
 
     # If an illumination correction file has been specified, process it
     if illumcorr_filename:
         try:
             process_illumcorr(illumcorr_filename)
         except IOError:
-            print "Could not process illumcorr_file %s" % illumcorr_filename
+            print("Could not process illumcorr_file %s" % illumcorr_filename)
             exit()
 
     # Return values read from input file. 
@@ -787,7 +790,7 @@ def getVisits_db(ra_min, ra_max, dec_min, dec_max, time_start, time_stop, opsimf
     ramax = wrapRA(ramax)
     # Check to see if addition of rad_fov_deg pushed ramin/max past each other, like if
     # input ramin/max was 0/360, then with rad_fov_deg, would now be 351/8 or so.
-    print "RA limits, before and after wrapping: ", ramin, ramax, ra_min, ra_max
+    print("RA limits, before and after wrapping: ", ramin, ramax, ra_min, ra_max)
     if (ramin>=ramax) & (ra_min<=ra_max):
         ramin=0
         ramax=360
@@ -807,7 +810,7 @@ def getVisits_db(ra_min, ra_max, dec_min, dec_max, time_start, time_stop, opsimf
     sqlwhere = sqlwhere + " and (night between %f and %f)" % (time_start, time_stop)
 #    sqlquery = sqlquery + " and filter='%s' group by expmjd order by min(expmjd)" %(opsimfilter)
     sqlwhere = sqlwhere + " and filter='%s'  " %(opsimfilter)
-    print "# ", sqlwhere
+    print("# ", sqlwhere)
     # Get Query results.
     opsimDB = db.OpsimDatabase(visitAddress)
     sqlresults = opsimDB.fetchMetricData(cols, sqlwhere)
@@ -815,7 +818,7 @@ def getVisits_db(ra_min, ra_max, dec_min, dec_max, time_start, time_stop, opsimf
     visits.dtype.names = ('id', 'ra', 'dec', 'skyrot', 'night', 'time', 'fiveSigmaDepth')
     
     
-    print "Fetched %d potential fields from database" %(len(sqlresults))
+    print("Fetched %d potential fields from database" %(len(sqlresults)))
     #ui.sqlEndConnect(conn, cursor)
     # Assign query results to appropriate fields in dictionary.
 #    visits = {}
@@ -879,7 +882,7 @@ def getVisits_db(ra_min, ra_max, dec_min, dec_max, time_start, time_stop, opsimf
     #visits['fiveSigmaDepth']=visits['fiveSigmaDepth'][condition]
     nvisits = len(visits['ra'])
     visits['id'] = np.arange(0, nvisits, 1, dtype='int')
-    print "Got %d visits from the opsim over the desired RA/Dec and time range" %(nvisits)
+    print("Got %d visits from the opsim over the desired RA/Dec and time range" %(nvisits))
     return visits
 
 def generateVisits(ra_min, ra_max,  dec_min, dec_max, nepochs, rad_fov_deg, 
@@ -964,7 +967,7 @@ def generateVisits(ra_min, ra_max,  dec_min, dec_max, nepochs, rad_fov_deg,
     # Should also cull visits which actually don't fall within ra/dec limits + radius_fov
     # were dithered out of limits.
     arraylen = len(visits['ra'])
-    print "Looking for visits between RA %f and %f, Dec %f and %f" %(ramin, ramax, decmin, decmax)
+    print("Looking for visits between RA %f and %f, Dec %f and %f" %(ramin, ramax, decmin, decmax))
     #for i in range(arraylen):        
     if (ramin < ramax):
         condition = ((visits['ra'] >= ramin - rad_fov_deg/np.cos(visits['dec']*deg2rad)/sqrt2) &
@@ -987,7 +990,7 @@ def generateVisits(ra_min, ra_max,  dec_min, dec_max, nepochs, rad_fov_deg,
     visits['night']=np.round(visits['time'])
     visits['night']=visits['night']-np.min(visits['night'])
     visits['fiveSigmaDepth']=visits['time']*0+24.6826 #just use an average r-band depth
-    print "Generated %d visits from the opsim over the desired RA/Dec and time range" %(nvisits)
+    print("Generated %d visits from the opsim over the desired RA/Dec and time range" %(nvisits))
     return visits
 
 def createVisitErrors(visits, zp_max, zp_grad_max, colterm_max, colterm_rad_max, filter_jitter, visit_filename,
@@ -1003,7 +1006,7 @@ def createVisitErrors(visits, zp_max, zp_grad_max, colterm_max, colterm_rad_max,
     # Add the new columns needed
     names = ['zpOff', 'zpGrad', 'zpGradDir', 'colorterm', 'colortermRad',
              'flatPhase','filterPosition', 'angles','filterXoff', 'filterYoff' ]
-    visits= rfn.merge_arrays([visits, np.zeros(nvisits, dtype=zip(names,[float]*len(names)))],
+    visits= rfn.merge_arrays([visits, np.zeros(nvisits, dtype=list(zip(names,[float]*len(names))))],
                              flatten=True, usemask=False)
     
     # Generate flat distribution of random zeropoint offsets between zero and zp_max. 
@@ -1161,7 +1164,7 @@ def getStars_db(sfile, cursor, calsimtable, id_start, ra_min, ra_max, dec_min, d
         nstars = 0
         for key in keys:
             stars[key] = None  ### 
-        print 'no stars'
+        print('no stars')
         return stars, nstars, id_start
     # Otherwise assign query results to dictionary of arrays.
     for key in keys:
@@ -1174,15 +1177,15 @@ def getStars_db(sfile, cursor, calsimtable, id_start, ra_min, ra_max, dec_min, d
             j = j+1
         i = i+1
     # Trim stars beyond the requested color range.
-    print 'I wanted nstars = ', nstars  ####XXX
-    print 'I got nstars =', len(stars['ra']) ###XXX
+    print('I wanted nstars = ', nstars)  ####XXX
+    print('I got nstars =', len(stars['ra'])) ###XXX
     stars['color'] = stars['gmag'] - stars['imag']
     condition = (stars['color'] > col_min) & (stars['color'] < col_max)
     keys = keys + ('color',)    
     for key in keys:
         stars[key] = stars[key][condition]
     nstars = len(stars['ra'])
-    print 'after color-cut, nstars =', nstars #XXX
+    print('after color-cut, nstars =', nstars) #XXX
     # give each star a unique identification number
     stars['id'] = np.arange(id_start, id_start+nstars, 1, dtype=int)
     id_next = stars['id'][len(stars['id'])-1] + 1
@@ -1251,7 +1254,7 @@ def generateStarMags(visits, ra_min, ra_max, dec_min, dec_max, mag_min, mag_max,
             cols.append(col)
     stars = msrgbDB.tables['stars'].query_columns_Array(colnames=cols, constraint=sqlwhere)
     nstars = np.size(stars)
-    stars = rfn.merge_arrays([stars, np.zeros(nstars, dtype=zip(['id'],[float]))],
+    stars = rfn.merge_arrays([stars, np.zeros(nstars, dtype=list(zip(['id'],[float])))],
                              flatten=True, usemask=False)
     stars['id'] = np.arange(nstars)+id_start
     id_start += nstars
@@ -1268,10 +1271,10 @@ def generateStarMags(visits, ra_min, ra_max, dec_min, dec_max, mag_min, mag_max,
     if (blockvisits['ra'] == None) or (stars['ra'] == None):
         return id_next
     if verbose:
-        print "In RA %f:%f, Dec %f:%f, found %d compatible visits, with %d possible star matches." \
+        print("In RA %f:%f, Dec %f:%f, found %d compatible visits, with %d possible star matches." \
               %(ramin, ramax,
                 decmin, decmax,
-                len(blockvisits['ra']), len(stars['ra']))
+                len(blockvisits['ra']), len(stars['ra'])))
     #Generate flux standard stars
     if fluxFrac != 0:
         starsCAL = {}
@@ -1284,7 +1287,7 @@ def generateStarMags(visits, ra_min, ra_max, dec_min, dec_max, mag_min, mag_max,
                     nCalStars = 0            
         else:
             nCalStars = np.round(fluxFrac)
-        print 'Making %f flux stars in block'%nCalStars
+        print('Making %f flux stars in block'%nCalStars)
         if nCalStars != 0:
             condition = np.round(np.random.rand(nCalStars)*(nCalStars-1))
             condition = condition.astype(int)
@@ -1314,7 +1317,7 @@ def generateStarMags(visits, ra_min, ra_max, dec_min, dec_max, mag_min, mag_max,
     #generate the power spectrum for the clouds.  
     if use_cloudsimage:
         sampling=256#512#256#128
-        print "using cloud sampling = %i"%sampling
+        print("using cloud sampling = %i"%sampling)
         windowsize=np.sqrt(2.*(2.*rad_fov_deg)**2.)
         ps=pws.PowerSpectrum(windowsize,sampling)
         ps.ComputeStructureFunction()
@@ -1325,7 +1328,7 @@ def generateStarMags(visits, ra_min, ra_max, dec_min, dec_max, mag_min, mag_max,
     if variability:
         sub_variability = variability.copy()
         stars_in_visit=np.in1d(variability['id'], stars['id'])
-        for key in sub_variability.keys():
+        for key in list(sub_variability.keys()):
             sub_variability[key]=sub_variability[key][stars_in_visit]
     # Go through each visit in block & calculate what stars fall within fov and where (rough x/y).
     for visitN in range(0, len(blockvisits['ra'])):
@@ -1338,7 +1341,7 @@ def generateStarMags(visits, ra_min, ra_max, dec_min, dec_max, mag_min, mag_max,
         condition = (starDist < rad_fov_deg)
         # Pull out the stars within this field of view - these are still arrays.
         starsFOV = {}
-        for key in stars.keys():
+        for key in list(stars.keys()):
             starsFOV[key] = stars[key][condition]
         # Asign the stars to a HEALpixel
         #HPdec = (decCen+90.)*deg2rad
@@ -1524,7 +1527,7 @@ def generateStarMags(visits, ra_min, ra_max, dec_min, dec_max, mag_min, mag_max,
                               starsFOV['dmag_exptvar']+starsFOV['dmag_illumcorr'])
 
         # add temperature effects on magnitude, if these have been calculated
-        if starsFOV.has_key('dmag_temp'):
+        if 'dmag_temp' in starsFOV:
             starsFOV['rmagobs'] += starsFOV['dmag_temp']
             
         # Calculate reported error
@@ -1581,7 +1584,7 @@ def generateStarMags(visits, ra_min, ra_max, dec_min, dec_max, mag_min, mag_max,
                               (starsFOV['ccd_Name'] != '') )
 
 
-        for key in starsFOV.keys():
+        for key in list(starsFOV.keys()):
             if key != 'night': #wtf, why didn't I make this the same length as everything else?
                 starsFOV[key]=starsFOV[key][condition]
         # Calculate patch data for comparison to output of selfcal solver
@@ -1708,13 +1711,13 @@ def fp_map_temp(fpTempModel, ccdName, ccdX, ccdY, time):
 def print_visitfile(vfile, visit_output="visit.dat", visits=None):
     if vfile==None:
         vfile = open(visit_output, 'w')
-        print >>vfile, "%s %s %s %s %s %s %s %s %s %s %s %s %s" %("#visitID", "raCen", "decCen",
+        print("%s %s %s %s %s %s %s %s %s %s %s %s %s" %("#visitID", "raCen", "decCen",
                                                          "skyRot", "time", "zpOffset",
                                                          "zpGradient", "zpGradDir",
-                                                         "colorterm", "colortermRad", "filterXoff", "filterYoff", "Night")
+                                                         "colorterm", "colortermRad", "filterXoff", "filterYoff", "Night"), file=vfile)
     if visits!=None:
         for visit in np.arange(np.size(visits['id'])):
-            print >>vfile, "%d %f %f %f %f %f %f %f %f %f %f %f %f" %(visits['id'][visit],
+            print("%d %f %f %f %f %f %f %f %f %f %f %f %f" %(visits['id'][visit],
                                                              visits['ra'][visit], visits['dec'][visit],
                                                              visits['skyrot'][visit],
                                                              visits['time'][visit],
@@ -1725,22 +1728,22 @@ def print_visitfile(vfile, visit_output="visit.dat", visits=None):
                                                              visits['colortermRad'][visit],
                                                              visits['filterXoff'][visit],
                                                              visits['filterYoff'][visit],
-                                                             visits['night'][visit])
+                                                             visits['night'][visit]), file=vfile)
     return vfile
         
 def print_starstruth(sfile, stardata_output="stardata.dat", stars=None):
     # This file contains the true stellar information
     if sfile==None: 
         sfile = open(stardata_output, 'w')  
-        print >>sfile, "%s %s %s %s %s %s" % ("#StarId","#StarDBId", "ra", "dec", "magTrue", "colTrue")
+        print("%s %s %s %s %s %s" % ("#StarId","#StarDBId", "ra", "dec", "magTrue", "colTrue"), file=sfile)
     if stars != None:
         # I agree - the star['id'] and star['dbid'] are somewhat redundant.
         # However, adding a star['id'] which is guaranteed sorted / increasing makes
         # some of the later analysis of the output easier. 
         for star in range(0, len(stars['id'])):
-            print >>sfile, "%d %d %f %f %f %f" % (stars['id'][star], stars['dbid'][star],
+            print("%d %d %f %f %f %f" % (stars['id'][star], stars['dbid'][star],
                                                stars['ra'][star], stars['dec'][star],
-                                               stars['rmagtrue'][star], stars['color'][star])
+                                               stars['rmagtrue'][star], stars['color'][star]), file=sfile)
     return sfile
 
 def print_obsfile(ofile, starobs_output="star_obs.dat", stars=None, subpatch=False):
@@ -1748,38 +1751,38 @@ def print_obsfile(ofile, starobs_output="star_obs.dat", stars=None, subpatch=Fal
     if ofile==None:
         ofile = open(starobs_output, 'w')
         #if subpatch:
-        print >>ofile, "%s %s %s %s %s %s %s %s %s %s" %("#PatchID", "StarID", "StarObsMag", "StarMagObsErr", "ScaledRadius", "HPid1", "HPid2","HPid3","HPid4","HPid5")
+        print("%s %s %s %s %s %s %s %s %s %s" %("#PatchID", "StarID", "StarObsMag", "StarMagObsErr", "ScaledRadius", "HPid1", "HPid2","HPid3","HPid4","HPid5"), file=ofile)
         #else:
         #    print >>ofile, "%s %s %s %s" %("#PatchID", "StarID", "StarObsMag", "StarMagObsErr")
     if stars!=None:
         for obj in range(0, len(stars['id'])):
             if subpatch:
                 starRadius = np.sqrt(stars['X'][obj]**2+stars['Y'][obj]**2)/fieldscale
-                print >>ofile, "%d  %d  %f  %f %f %d %d %d %d %d" %(stars['fullpatch'][obj], stars['id'][obj],
-                 stars['rmagobs'][obj], stars['magerr'][obj], starRadius, stars['HPid1'][obj], stars['HPid2'][obj], stars['HPid3'][obj], stars['HPid4'][obj],stars['HPid5'][obj]) 
+                print("%d  %d  %f  %f %f %d %d %d %d %d" %(stars['fullpatch'][obj], stars['id'][obj],
+                 stars['rmagobs'][obj], stars['magerr'][obj], starRadius, stars['HPid1'][obj], stars['HPid2'][obj], stars['HPid3'][obj], stars['HPid4'][obj],stars['HPid5'][obj]), file=ofile) 
             else:
-                print >>ofile, "%d  %d  %f  %f %d %d %d %d %d %d" %(stars['fullpatch'][obj], stars['id'][obj],
-                stars['rmagobs'][obj], stars['magerr'][obj], 0, stars['HPid1'][obj], stars['HPid2'][obj], stars['HPid3'][obj], stars['HPid4'][obj],stars['HPid5'][obj])
+                print("%d  %d  %f  %f %d %d %d %d %d %d" %(stars['fullpatch'][obj], stars['id'][obj],
+                stars['rmagobs'][obj], stars['magerr'][obj], 0, stars['HPid1'][obj], stars['HPid2'][obj], stars['HPid3'][obj], stars['HPid4'][obj],stars['HPid5'][obj]), file=ofile)
     return ofile
 
 def print_patchfile(pfile, patch_output="patchdata.dat", patch=None):
     # This file is used for comparing output of selfcal_solver/simple.x
     if pfile == None:
         pfile = open(patch_output, 'w')
-        print >>pfile, "%s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s" \
+        print("%s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s" \
               %("#visitID", "fullpatch", "subpatch", "nstars",
                 "ra", "dec", "rmagtrue", "color", "dmag", "dmag_rms",
                 "dmag_rand", "dmag_rand_rms", "dmag_zp", "dmag_zp_rms",
-                "dmag_color", "dmag_color_rms" )
+                "dmag_color", "dmag_color_rms" ), file=pfile)
     else:
-        print >>pfile, "%d %d %d %f %f %f %f %f %f %f %f %f %f %f %f %f" \
+        print("%d %d %d %f %f %f %f %f %f %f %f %f %f %f %f %f" \
               %(patch['visitid'], patch['fullpatch'], patch['subpatch'],
                 patch['count'], patch['ra'], patch['dec'],
                 patch['rmagtrue'], patch['color'],
                 patch['dmag'], patch['dmag_rms'],
                 patch['dmag_rand'], patch['dmag_rand_rms'],
                 patch['dmag_zp'], patch['dmag_zp_rms'],
-                patch['dmag_color'], patch['dmag_color_rms'])
+                patch['dmag_color'], patch['dmag_color_rms']), file=pfile)
     return pfile
 
 
@@ -1788,16 +1791,16 @@ def print_masterfile(mfile, master_output="master_cal.dat", visitid=None, stars=
     # This file keeps (ALL) output info for evaluation
     if mfile==None:
         mfile = open(master_output, 'w') 
-        print >>mfile, "%s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s" \
+        print("%s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s" \
               %("#VisitID", "PatchID", "subPatchID", "StarID", "StarDBID", "StarObsMag", "StarMagErr",
                 "dMag_var", "dMag_snr", "dMag_zp", "dMag_zp_dist", "dMag_color", "dMag_color_dist",
                 "dMag_sin", "dMag_flat_sin", "dMag_cloud", "dMag_cloud_image","dMag_rr", "StarTrueMag", "StarTrueCol", "StarRA",
                 "StarDec", "RAcen_fov", "DecCen_fov",
-                "StarX", "StarY", "Night", "dm5", "dMag_kep", "dMag_gainvar", "dMag_exptvar", "dMag_illumcor", "dtemp", "dmag_temp")
+                "StarX", "StarY", "Night", "dm5", "dMag_kep", "dMag_gainvar", "dMag_exptvar", "dMag_illumcor", "dtemp", "dmag_temp"), file=mfile)
     if visitid!=None:
         # Print master output for star measurements (all info), on all of visit.
         for obj in range(0, len(stars['ra']), 1):
-            print >>mfile, "%d %d %d %d %d %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %s %f %f %f %f %f %f %f" \
+            print("%d %d %d %d %d %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %s %f %f %f %f %f %f %f" \
                   % (visitid, stars['fullpatch'][obj], stars['subpatch'][obj],
                      stars['id'][obj], stars['dbid'][obj], stars['rmagobs'][obj], stars['magerr'][obj],
                      stars['dmag_var'][obj], stars['dmag_snr'][obj],
@@ -1808,7 +1811,7 @@ def print_masterfile(mfile, master_output="master_cal.dat", visitid=None, stars=
                      stars['dec'][obj],
                      raCen, decCen, stars['X'][obj], stars['Y'][obj], stars['night'], stars['dm5'][obj], stars['dmag_kep'][obj],
                      stars['dmag_gainvar'][obj], stars['dmag_exptvar'][obj], stars['dmag_illumcorr'][obj],
-                     stars['dtemp'][obj], stars['dmag_temp'][obj])
+                     stars['dtemp'][obj], stars['dmag_temp'][obj]), file=mfile)
     return mfile
 
 
@@ -1819,14 +1822,14 @@ def print_masterfile(mfile, master_output="master_cal.dat", visitid=None, stars=
 
 if __name__ == "__main__":
     # Main executable. 
-    print 'starting __main__'
+    print('starting __main__')
     import sys
     if len(sys.argv) == 1 :
         parameter_filename = "NULL"
-        print "No parameter file given: will use defaults"
+        print("No parameter file given: will use defaults")
     else:
         parameter_filename = sys.argv[1]
-        print "Using parameter file %s" %(parameter_filename)
+        print("Using parameter file %s" %(parameter_filename))
     
     # Read input parameters from input file.
     (raMin, raMax, decMin, decMax,
@@ -1863,7 +1866,7 @@ if __name__ == "__main__":
     # (the point being, I would like 'X' to scale to 1 at edge, so that zp_grad_max can
     #  correspond directly to the maximum zeropoint offset expected from the gradient)
     xmax, ymax = gnomonic_project_toxy(radius_fov*deg2rad, radius_fov*deg2rad, 0, 0)
-    print "# fieldscale in gnomonic projection %f %f" %(xmax, ymax)
+    print("# fieldscale in gnomonic projection %f %f" %(xmax, ymax))
     fieldscale = max(xmax, ymax)
 
     # If we're running for the 'y' filter, prepare for using temperature dependent magnitudes
@@ -1907,7 +1910,7 @@ if __name__ == "__main__":
     decblocks = np.arange(decMin, decMax, decblocksize)
     nblocks = len(rablocks) * len(decblocks)
     if verbose:
-        print "Sky divided into %d blocks." %(nblocks)
+        print("Sky divided into %d blocks." %(nblocks))
     # Calculate total sky area in simulation.
     junk = np.sin(decMax*deg2rad) - np.sin(decMin*deg2rad)
     if (raMin < raMax):
@@ -1934,10 +1937,10 @@ if __name__ == "__main__":
                 block_sky_area = junk * (ra_max_block + 360 - ra_min_block)
             nstars_block = np.floor(nStarTot * block_sky_area / total_sky_area)
             if verbose:
-                print "Working on RA %f to %f; Dec %f to %f." %(ra_min_block, ra_max_block,
-                                                               dec_min_block, dec_max_block)
-                print " Generating %d stars in this block. " %(nstars_block)
-                print " Area in this block is %f, total area is %f" %(block_sky_area, total_sky_area)
+                print("Working on RA %f to %f; Dec %f to %f." %(ra_min_block, ra_max_block,
+                                                               dec_min_block, dec_max_block))
+                print(" Generating %d stars in this block. " %(nstars_block))
+                print(" Area in this block is %f, total area is %f" %(block_sky_area, total_sky_area))
             id_start = generateStarMags(visits, ra_min_block, ra_max_block,
                                             dec_min_block, dec_max_block,
                                             magmin, magmax, colmin, colmax,color_obs_noise,color_correction_error,

@@ -1,3 +1,4 @@
+from builtins import zip
 import numpy as np
 import numpy.lib.recfunctions as rfn
 
@@ -15,6 +16,6 @@ def visitOffsets(visits, zpOff=1.):
     
     visits.dtype.names = dnames
     
-    zp = (np.random.uniform(size=visits.size)*zpOff).astype(zip(['zpOff'],[float]))
+    zp = (np.random.uniform(size=visits.size)*zpOff).astype(list(zip(['zpOff'],[float])))
     visits = rfn.merge_arrays([visits, zp],  flatten=True, usemask=False)
     return visits

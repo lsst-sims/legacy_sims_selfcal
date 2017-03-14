@@ -12,6 +12,8 @@
 # common items
 
 #       modules
+from __future__ import print_function
+from builtins import range
 from numpy import *
 import Astrotools
 import copy
@@ -47,7 +49,7 @@ aparmf.close()
 #               
 #               Adding atmosphere parameters at appropriate MJD time 
 #
-print 'succesfully read ', len(aparmlis),'atmos parms in file : ',Atfile
+print('succesfully read ', len(aparmlis),'atmos parms in file : ',Atfile)
 
 #
 # extract MJD start 
@@ -82,8 +84,8 @@ for iat in range(0,natmos):
             scale2 = float(parv.split('=')[1])
     avpl[iat] = [vis0,visamp,visaz,zaer11,zaer12,scale1,zaer21,zaer22,scale2]
     atpl[iat] = [aparmlis[iat].split('VIS0')[0]]
-print 'Aerosol drivers set for ' , iat, 'atmospheres'
-print 'last are :' , avpl[iat],atpl[iat]
+print('Aerosol drivers set for ' , iat, 'atmospheres')
+print('last are :' , avpl[iat],atpl[iat])
 #
 
 #_______________________________________________________________________________
@@ -134,8 +136,8 @@ for hh in headextra:
 
 obshlines = fullhlines
 #
-print 'Succesfully read ', len(obshlines),' pointings in file : '\
-      ,LSSTdatafile 
+print('Succesfully read ', len(obshlines),' pointings in file : '\
+      ,LSSTdatafile) 
   
 nobs = len(obshlines)
 pplis = [[]]*nobs
@@ -156,7 +158,7 @@ for ipl in range(1,nobs):
         Declis[ipl] = float(pline[colDec])
     nend = ipl+1
     #print nend
-print 'pointing parms extracted for  ', nend,'  pointings'
+print('pointing parms extracted for  ', nend,'  pointings')
 # pplis contains one parameter string per LSST pointing
 # mjdlis contains MJD times of LSST pointings 
 #_______________________________________________________________________________
@@ -210,5 +212,5 @@ seqparmfil = open(sequence_Parmfile,'w')
 for ic in range(1,nend):
     seqparmfil.write(pplis[ic])
 seqparmfil.close()
-print nend,'parameter lines  written in batch ',expname
-print '       from ',pplis[1][:20], '  to ',pplis[ipoint][:20]
+print(nend,'parameter lines  written in batch ',expname)
+print('       from ',pplis[1][:20], '  to ',pplis[ipoint][:20])

@@ -11,12 +11,14 @@ Usage:
      (for each visit). 
 
 """
+from builtins import range
+from builtins import object
 
 from math import *
 import numpy
 from statsmodels.tsa.arima_process import arma_acf
 
-class ArmaSf():
+class ArmaSf(object):
     def __init__(self):
         return
 

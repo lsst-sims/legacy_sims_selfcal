@@ -18,6 +18,9 @@
 # 
 #------------------------------------------------------------
 #
+from __future__ import print_function
+from builtins import str
+from builtins import range
 from numpy import *
 from copy import deepcopy
 import readcard
@@ -55,7 +58,7 @@ expname = 'Opsim3.61.02sel'
 #
 
 parmfile = runpath +expname+ '_parmlist.dat'
-print 'parmfile %s' %(parmfile)
+print('parmfile %s' %(parmfile))
 runs = readcard.rdc(parmfile) # runs will gather parameter string for all runs
 
 ################################################
@@ -91,7 +94,7 @@ for irun in range(0,nrun):
 # get list of parameters authorized for change with suitable format
 #  and location in modtran cards
 
-print "here"
+print("here")
 parcatf = parpath +'formparm.dat'
 parmcat = readparms.rdp(parcatf)
 

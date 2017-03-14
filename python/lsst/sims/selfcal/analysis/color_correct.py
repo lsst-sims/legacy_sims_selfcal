@@ -1,3 +1,5 @@
+from __future__ import print_function
+from builtins import range
 ####################################################################
 #  Written by: Peter Yoachim - UW - v1.0 10/21/10
 #  Questions or comments, email : yoachim@uw.edu
@@ -75,7 +77,7 @@ def sim2db(master_table_name, index_tag, masterfile='master_cal.dat', starfile='
     os.system("perl -i -p -e 'tr/ //s;' "+bestfitpatchfile)  ##remove  any extra spaces
 
     #open the database
-    print 'opening connection'
+    print('opening connection')
     #db = pg.connect(dsn = 'localhost:calsim')
     db = pg.connect(host='localhost', dbname='calsim')
     cursor = db.cursor ()
@@ -92,14 +94,14 @@ def sim2db(master_table_name, index_tag, masterfile='master_cal.dat', starfile='
         cursor.execute(cmd)
         cursor.execute('DROP INDEX IF EXISTS stardataid'+index_tag+' ;')
         cmd='CREATE INDEX stardataid'+index_tag+' on '+master_table_name+'_stars (StarID)'
-        print cmd
+        print(cmd)
         cursor.execute(cmd)
         db.commit()
 
     if masterfile != None:
-        print 'creating master table'
+        print('creating master table')
         cursor.execute ("DROP TABLE IF EXISTS "+master_table_name)
-        print "DROP TABLE IF EXISTS "+master_table_name
+        print("DROP TABLE IF EXISTS "+master_table_name)
         cmd = "CREATE TABLE " + master_table_name + " ( \
         VisitID   int, \
         PatchID   int,\
@@ -134,15 +136,15 @@ def sim2db(master_table_name, index_tag, masterfile='master_cal.dat', starfile='
         dmag_exptvar      double precision\
         );"
 
-        print cmd
+        print(cmd)
         cursor.execute(cmd)
         db.commit()
 
         ##copy the masterfile into the db
         cmd = "COPY " + master_table_name + " from '"+cwd+'/' \
               + masterfile + "' WITH DELIMITER ' ' HEADER CSV;"
-        print 'Putting the big master file in the DB'
-        print cmd
+        print('Putting the big master file in the DB')
+        print(cmd)
         cursor.execute (cmd)
         db.commit()
 
@@ -174,30 +176,30 @@ def sim2db(master_table_name, index_tag, masterfile='master_cal.dat', starfile='
     
     #Create the bestfit stars table
     cursor.execute ("DROP TABLE IF EXISTS "+bestfit_table_name)
-    print "DROP TABLE IF EXISTS "+bestfit_table_name
+    print("DROP TABLE IF EXISTS "+bestfit_table_name)
     cmd = "CREATE TABLE " + bestfit_table_name + " (StarID int, StarMagCalib double precision);"
-    print cmd
+    print(cmd)
     cursor.execute (cmd)
     db.commit()
 
     ##Copy the bestfit stars stuff in
     cmd = "COPY "+  bestfit_table_name + " FROM '"+cwd+'/'+bestfitfile+"' DELIMITER ' ';"
-    print cmd
+    print(cmd)
     cursor.execute (cmd)
     db.commit()
 
     #Create the bestfit patch table
     cursor.execute ("DROP TABLE IF EXISTS "+bestfit_patch_table_name)
-    print "DROP TABLE IF EXISTS "+bestfit_patch_table_name
+    print("DROP TABLE IF EXISTS "+bestfit_patch_table_name)
     cmd = "CREATE TABLE " + bestfit_patch_table_name + " (PatchID int, dmagcal double precision);"
-    print cmd
+    print(cmd)
     cursor.execute (cmd)
     db.commit()
 
     ##Copy the bestfit stars stuff in
     cmd = "COPY "+  bestfit_patch_table_name + " FROM '"+cwd+'/'\
           +bestfitpatchfile+"' DELIMITER ' ';"
-    print cmd
+    print(cmd)
     cursor.execute (cmd)
     db.commit()
 
@@ -215,7 +217,7 @@ def sim2db(master_table_name, index_tag, masterfile='master_cal.dat', starfile='
 
 
     
-    print 'finished, closing connection'
+    print('finished, closing connection')
     cursor.close()
     db.close()
 
@@ -226,8 +228,8 @@ def sim2db(master_table_name, index_tag, masterfile='master_cal.dat', starfile='
 def readDict(filename):
     d=n.load(filename)
     result={}
-    for i in range(len(d.keys())):
-        result[d.keys()[i]]=d[d.keys()[i]]
+    for i in range(len(list(d.keys()))):
+        result[list(d.keys())[i]]=d[list(d.keys())[i]]
     return result
 
 #Print the corected star_obs file
@@ -236,11 +238,11 @@ def print_obsfile(ofile, starobs_output="star_obs_corrected.dat", stars=None):
     # This is the file that goes to selfCalib
     if ofile==None:
         ofile = open(starobs_output, 'w') 
-        print >>ofile, "%s %s %s %s" %("#PatchID", "StarID", "StarObsMag", "StarMagObsErr")
+        print("%s %s %s %s" %("#PatchID", "StarID", "StarObsMag", "StarMagObsErr"), file=ofile)
     if stars!=None:
         for obj in range(0, len(stars['id'])):
-            print >>ofile, "%d %d %f %f" %(stars['fullpatch'][obj], stars['id'][obj],
-                                           stars['rmagobs'][obj], stars['magerr'][obj])
+            print("%d %d %f %f" %(stars['fullpatch'][obj], stars['id'][obj],
+                                           stars['rmagobs'][obj], stars['magerr'][obj]), file=ofile)
     return ofile
 
 #Bin the stars spatially and by color to find delta mag terms
@@ -303,7 +305,7 @@ def makeDeltamap(table1, nspace_bins=10, ncolor_bins=10, \
                 #add noise to the color
                 measured_color=data['StarTrueCol'] + \
                                 color_noise*n.random.randn(len(data['StarTrueCol']))
-                print "generating color map", i,j
+                print("generating color map", i,j)
                 for k in range(len(color_bins)-1):
                     in_bin=n.where((measured_color >= color_bins[k]) & \
                            (measured_color <= color_bins[k+1]) )
@@ -363,7 +365,7 @@ def applyDeltamap(table1, delta_file='delta_data.npz',color_noise=0.05):
                 
                 measured_color.clip(min=n.min(color_bins), max=n.max(color_bins))
                 del data['true_color']
-                print 'applying color map',i,j
+                print('applying color map',i,j)
 
                 for k in range(len(delta_map['color_bins'])-1):
                     in_bin=n.where((measured_color >= color_bins[k]) \
@@ -392,9 +394,9 @@ def checkColor(stardata='stardata.dat',patchdata='patchdata.dat',\
     good=n.where(n.abs(stardat['magdiff']) < 0.05)
     if n.size(good) == 0:
         good=n.array([1])
-    print 'number of good stars = %f'%n.size(good)
-    print 'number of crazy bad fit stars = %f' %(n.size(stardat['magdiff']) - n.size(good))
-    print 'RMS of stellar residuals = %f'%stardat['magdiff'][good].std()
+    print('number of good stars = %f'%n.size(good))
+    print('number of crazy bad fit stars = %f' %(n.size(stardat['magdiff']) - n.size(good)))
+    print('RMS of stellar residuals = %f'%stardat['magdiff'][good].std())
 
     rms=stardat['magdiff'][good].std()
 
@@ -528,7 +530,7 @@ def plotStar(table, starid='4'):
 
 
     #close the db connection
-    print 'finished, closing connection'
+    print('finished, closing connection')
     cursor.close()
     db.close()
 
@@ -561,27 +563,27 @@ def corrected2db(name, index_tag, bfnum='2'):
     os.system("perl -i -p -e 's/^\s+//;' "+bestfitpatchfile) ##remove leading spaces
     os.system("perl -i -p -e 'tr/ //s;' "+bestfitpatchfile)  ##remove  any extra spaces
 
-    print "DROP TABLE IF EXISTS "+bestfit_table_name    
+    print("DROP TABLE IF EXISTS "+bestfit_table_name)    
     cursor.execute ("DROP TABLE IF EXISTS "+bestfit_table_name)
     cmd = "CREATE TABLE " + bestfit_table_name + " (StarID int, StarMagCalib double precision);"
-    print cmd
+    print(cmd)
     cursor.execute(cmd)
 
     cmd = "COPY "+  bestfit_table_name + " FROM '"+cwd+'/'+bestfitfile+"' DELIMITER ' ';"
-    print cmd
+    print(cmd)
     cursor.execute (cmd)
 
     #Create the bestfit patch table
     cursor.execute ("DROP TABLE IF EXISTS "+bestfit_patch_table_name)
-    print "DROP TABLE IF EXISTS "+bestfit_patch_table_name
+    print("DROP TABLE IF EXISTS "+bestfit_patch_table_name)
     cmd = "CREATE TABLE " + bestfit_patch_table_name + " (PatchID int, dmagcal double precision);"
-    print cmd
+    print(cmd)
     cursor.execute (cmd)
 
     ##Copy the bestfit patch stuff in
     cmd = "COPY "+  bestfit_patch_table_name + " FROM '"+cwd+'/'\
           +bestfitpatchfile+"' DELIMITER ' ';"
-    print cmd
+    print(cmd)
     cursor.execute (cmd)
 
     cursor.execute('DROP INDEX IF EXISTS starid_bf'+index_tag+bfnum+' ;')
@@ -606,20 +608,20 @@ def color_corrected2db(name, num, filename='star_obs_corrected.dat'):
 
     #Create the bestfit stars table
     cursor.execute ("DROP TABLE IF EXISTS "+name+'cc_obs'+num)
-    print "DROP TABLE IF EXISTS "+name+'cc_obs'+num
+    print("DROP TABLE IF EXISTS "+name+'cc_obs'+num)
     cmd = "CREATE TABLE " +  name+'cc_obs'+num + " (PatchID int, StarID int, StarObsMag double precision, StarMagObsErr double precision);"
-    print cmd
+    print(cmd)
     cursor.execute (cmd)
 
     #populate table
     cmd="COPY "+ name+'cc_obs'+num  + " FROM '"+cwd+'/'\
           +filename+"' DELIMITER ' ' HEADER CSV;"
-    print cmd
+    print(cmd)
     cursor.execute (cmd)
 
     #index things
     cmd = "CREATE INDEX starid_cc" + name+num+" on " + name+'cc_obs'+num  + " (StarID);"
-    print cmd
+    print(cmd)
     cursor.execute (cmd)
 
     #close the connection
@@ -704,14 +706,14 @@ def bfpbsplot(name, bfnum='2', from_main=False, file=None):
     zp_off=-666
     if n.size(zeroPatch) != 0:
         zp_off = patchdat['magdiff'][zeroPatch]
-        print 'The flux-star patch is %.2f mmag off from the best zero point'%(patchdat['magdiff'][zeroPatch]*1e3)
+        print('The flux-star patch is %.2f mmag off from the best zero point'%(patchdat['magdiff'][zeroPatch]*1e3))
         pyl.text(0.02, 0.95,'$\Delta$ Flux ZP =%.2f mmag'%(patchdat['magdiff'][zeroPatch]*1e3), horizontalalignment='left',
                  verticalalignment='top', transform = ax.transAxes)
         cmd = 'select count(PatchID) from '+name+' where PatchID = 0;'
         cursor.execute(cmd)
         nflux = n.ravel(cursor.fetchall())
         nflux=nflux.astype('float')
-        print 'Number of Flux stars = %f'%nflux
+        print('Number of Flux stars = %f'%nflux)
     pyl.savefig('StatsRepeat.png', format='png')
 
     ui.sqlEndConnect(conn, cursor, verbose=True)
@@ -779,32 +781,32 @@ def clipReweight(name, rms_clip=0.04, reweight=True, error_min=0.003):
     #find the RMS per star, sorted by star ID
     cmd = 'SELECT sbf.starID, STDDEV(o.starObsMag - p.dmagcal - sbf.starmagcalib) from '+name+'_bestfitpatch as p, '+name+' as o, '+name+'_bestfit as sbf WHERE p.patchid = o.PatchID and o.starid = sbf.starID GROUP BY sbf.starid ORDER BY sbf.starid;'
     keys=['id','stds']
-    print "Finding the RMS per star"
+    print("Finding the RMS per star")
     stardata = ui.sqlQuery(cursor,cmd) #n.array(cursor.fetchall())
     stardata = ui.assignResults(stardata, keys)
     #clip off the high RMS stars
     condition = n.where(stardata['stds'] < rms_clip)
-    print 'clipping %i stars due to high RMS in repeat observations'%(n.size(stardata['stds'])-n.size(condition))
-    for key in stardata.keys():
+    print('clipping %i stars due to high RMS in repeat observations'%(n.size(stardata['stds'])-n.size(condition)))
+    for key in list(stardata.keys()):
         stardata[key]=stardata[key][condition]
-    print 'got stats for %i stars'%n.size(stardata['id'])
+    print('got stats for %i stars'%n.size(stardata['id']))
     #find the RMS per patch
     if reweight:        
-        print "Finding RMS per patch"
+        print("Finding RMS per patch")
         cmd = 'SELECT o.PatchID, STDDEV(o.starObsMag  - sd.startruemag) from '+name+'_bestfitpatch as p, '+name+' as o, '+name+'_stars as sd, '+name+'_bestfit as sbf WHERE p.patchid = o.PatchID and o.starid = sd.starID and o.starid = sbf.starid GROUP BY o.PatchID;'
         keys=['id','stds']
         patchdata = ui.sqlQuery(cursor,cmd)
         patchdata=ui.assignResults(patchdata,keys)
         low_error = n.where(patchdata['stds'] < error_min)
         patchdata['stds'][low_error]=error_min
-        print 'got stats on %i patches'%n.size(patchdata['stds'])
+        print('got stats on %i patches'%n.size(patchdata['stds']))
     #now to query for blocks of patchid, starid, starobsmag, starobsmagerr.  I think grab blocks of patches
     cmd='SELECT max(patchid),min(patchid) from '+name
     cursor.execute(cmd)
     patchRange = n.ravel(cursor.fetchall())
     num = n.ceil((n.max(patchRange)-n.min(patchRange))/blocksize)
     keys = ('fullpatch', 'id', 'rmagobs', 'magerr')
-    print "grabbing %i chunks of patches and reweighting errors by patch RMS"%num
+    print("grabbing %i chunks of patches and reweighting errors by patch RMS"%num)
     for i in n.arange(num):
         minp = n.min(patchRange)+blocksize*i
         maxp = n.min(patchRange)+blocksize*(i+1)
@@ -840,17 +842,17 @@ def star_out_clip(name, outclip=0.05, dbname='calsim', reweight=True):
     good = n.ravel(n.where(n.abs(results['resid']) < outclip))
     bad = n.ravel(n.where(n.abs(results['resid']) > outclip))
     #need to clobber the old star data file, and delete the right rows from master table so the later analysis works.
-    print 'deleting %i observations from the master database, leaving %i stars'%(n.size(bad),n.size(good))
+    print('deleting %i observations from the master database, leaving %i stars'%(n.size(bad),n.size(good)))
     for i in n.arange(n.size(bad)):
         cmd = 'delete from '+name+' where starid = %d and patchid = %d'%(results['id'][bad[i]],results['fullpatch'][bad[i]])
         #print i,cmd
         cursor.execute(cmd)
-    for key in results.keys():
+    for key in list(results.keys()):
         results[key] = results[key][good]
-    print 'resulting obsfile should have %i stars in it'%(n.size(results['id']))
+    print('resulting obsfile should have %i stars in it'%(n.size(results['id'])))
     if reweight:
         cmd = 'SELECT o.PatchID, STDDEV(o.starObsMag - p.dmagcal - sd.startruemag) from '+name+'_bestfitpatch as p, '+name+' as o, '+name+'_stars as sd, '+name+'_bestfit as sbf WHERE p.patchid = o.PatchID and o.starid = sd.starID and o.starid = sbf.starid GROUP BY o.PatchID order by o.patchid;'
-        print cmd
+        print(cmd)
         cursor.execute(cmd)
         data=n.array(cursor.fetchall())
         patch_id = n.ravel(data[:,0]) 
@@ -875,7 +877,7 @@ def plotperstar(name, file=None):
                               dbtype='pgsql', username=None, passwdname=None)
 #    cmd = 'SELECT sd.starID, AVG(o.starObsMag - p.dmagcal - sd.startruemag), STDDEV(o.starObsMag - p.dmagcal - sd.startruemag) from '+name+'_bestfitpatch as p, '+name+' as o, '+name+'_stars as sd WHERE p.patchid = o.PatchID and o.starid = sd.starID GROUP BY sd.starid;'
     cmd = 'SELECT sd.starID, AVG(o.starObsMag - p.dmagcal - sd.startruemag), STDDEV(o.starObsMag - p.dmagcal - sd.startruemag) from '+name+'_bestfitpatch as p, '+name+' as o, '+name+'_stars as sd, '+name+'_bestfit as sbf WHERE p.patchid = o.PatchID and o.starid = sd.starID and o.starid = sbf.starid GROUP BY sd.starid;'
-    print cmd
+    print(cmd)
     cursor.execute(cmd)
     data = n.array(cursor.fetchall())
     floating_zp = n.median(data[:,1])
@@ -927,12 +929,12 @@ def plotperstar(name, file=None):
 
     #grab the stats per patch
     cmd = 'SELECT o.PatchID, AVG(o.starObsMag - p.dmagcal - sd.startruemag), STDDEV(o.starObsMag - p.dmagcal - sd.startruemag) from '+name+'_bestfitpatch as p, '+name+' as o, '+name+'_stars as sd, '+name+'_bestfit as sbf WHERE p.patchid = o.PatchID and o.starid = sd.starID and o.starid = sbf.starid GROUP BY o.PatchID;'
-    print cmd
+    print(cmd)
     cursor.execute(cmd)
     data=n.array(cursor.fetchall())
     patch_resid_ave = n.ravel(data[:,1]- n.ravel(floating_zp)) #remove floating zp
     patch_resid_std = n.ravel(data[:,2])
-    print 'a few elements from the std array', patch_resid_std[0:4]
+    print('a few elements from the std array', patch_resid_std[0:4])
     del data
     pyl.figure()
     num,bins,patches = pyl.hist(patch_resid_ave[n.where(n.abs(patch_resid_ave) < 0.05 )]*1000, bins=50)
@@ -1005,7 +1007,7 @@ def plotResidmap(name,nx=10, ny=10):
         for j in range(len(ybins)-1):
             if (xbins[i]**2+ybins[j]**2 < max_rad**2) & (xbins[i+1]**2+ybins[j+1]**2 < max_rad**2)\
                    & (xbins[i+1]**2+ybins[j]**2 < max_rad**2) & (xbins[i]**2+ybins[j+1]**2 < max_rad**2):
-               print i,j
+               print(i,j)
                cmd='select m.starobsmag-p.dmagcal-m.startruemag FROM '+name+\
                     ' as m, '+name+'_bestfitpatch as p '+\
                     'WHERE m.patchid=p.patchid  and m.starx > %f'%(xbins[i])+\
@@ -1116,7 +1118,7 @@ def flat_correct_pernight(sim_name, nx=10,ny=10, plotnights=[31]):
     keys=['id', 'fullpatch','starx','stary','rmagobs', 'magerr','dm']
     for i in nights:
         #print n.where(nights == i)
-        print i
+        print(i)
         cmd='select a.starid,a.patchid,a.starx,a.stary,a.starobsmag,a.starmagerr,a.starobsmag-bfp.dmagcal-bf.starmagcalib from %s as a, %s_bestfit as bf, %s_bestfitpatch as bfp where bf.starid=a.starid and bfp.patchid=a.patchid and  a.night=%i;'%(sim_name,sim_name,sim_name,n.max(i))
         result=ui.sqlQuery(cursor,cmd, verbose=False)
         data_in=ui.assignResults(result,keys)
@@ -1182,7 +1184,7 @@ def flat_correct_nightblock(sim_name, nx=10,ny=10, night_blocks=30, plotblock=[0
     keys=['id', 'fullpatch','starx','stary','rmagobs', 'magerr','dm']
     for i in n.arange(n.size(night_chunks)-1):
         #print n.where(nights == i)
-        print i
+        print(i)
         night_min=night_chunks[i]+1 #this should works since night begins at 1.
         night_max=night_chunks[i+1]
         cmd='select a.starid,a.patchid,a.starx,a.stary,a.starobsmag,a.starmagerr,a.starobsmag-bfp.dmagcal-bf.starmagcalib from %s as a, %s_bestfit as bf, %s_bestfitpatch as bfp where bf.starid=a.starid and bfp.patchid=a.patchid and  a.night >= %f and a.night < %f;'%(sim_name,sim_name,sim_name,night_min,night_max)
@@ -1235,10 +1237,10 @@ def flat_correct_nightblock(sim_name, nx=10,ny=10, night_blocks=30, plotblock=[0
 
 def massivedb(cursor, cmd,nrows,keys):
     #retrieve results from sql querry in blocks so memory usage doesn't explode
-    print 'executing large sql'
+    print('executing large sql')
     cursor.execute(cmd)
     nf=int(n.floor(nrows)/1e6)-1
-    print 'fetching first million'
+    print('fetching first million')
     d1=n.array(cursor.fetchmany(size=int(1e6)))
     result={}
     for i in range(n.size(keys)):
@@ -1260,7 +1262,7 @@ def flat_correct_global(sim_name, nx=10,ny=10):
     cmd='select count(starx) from %s'%(sim_name)
     cursor.execute(cmd)
     count=n.ravel(cursor.fetchall())
-    print 'retrieved count'
+    print('retrieved count')
     
     cmd='select a.starid,a.patchid,a.starx,a.stary,a.starobsmag,a.starmagerr,a.starobsmag-bfp.dmagcal-bf.starmagcalib from %s as a, %s_bestfit as bf, %s_bestfitpatch as bfp where bf.starid=a.starid and bfp.patchid=a.patchid ;'%(sim_name,sim_name,sim_name)
 
@@ -1320,7 +1322,7 @@ def residCheck(table,night=None, visitID= None, dmag='dmag_var+dmag_snr+dmag_zp_
         cmd='select distinct visitid from %s where night=%i limit 10'%(table,night)
         cursor.execute(cmd)
         uvids=n.array(cursor.fetchall(),dtype='int')
-        print uvids[0]
+        print(uvids[0])
         cmd='select  starx,stary,%s from %s where night=%i and visitid=%i'%(dmag,table,night,uvids[0])
     else:
         cmd='select  starx,stary,%s from %s where night=%i'%(dmag,table,night)
@@ -1411,14 +1413,14 @@ def bigLoad(file, nentries=None, keys=None, dtype=float,skipline=0 ):
 def stupid_fitter():
     """Skip the fitter and just assume the zeropoints are known """    
     stardata = bigLoad('star_obs.dat.s', skipline=1, keys=('patchid', 'starid', 'starobsmag','magerr'), dtype=('int','int','float','float'))
-    print 'star_obs.dat loaded'
+    print('star_obs.dat loaded')
     patch_data = {}
     star_out = {}
     patch_data['upatch']=n.unique(stardata['patchid'])
     patch_data['patch_zp'] = n.zeros(n.size(patch_data['upatch']))
     star_out['ustar'] = n.unique(stardata['starid'])
     star_out['star_mags']=n.zeros(n.size(star_out['ustar']))
-    print 'setup the arrays, now to go through the sorted list'
+    print('setup the arrays, now to go through the sorted list')
     k=0
     for i in n.arange(n.size(star_out['ustar'])):
         good=n.array(k)
@@ -1439,23 +1441,23 @@ def rmsbins(name, file=None):
     ranges=[0.,.3,.7,1.5]
     k=0
     cmd = 'SELECT AVG(f.starmagcalib- sd.startruemag) from '+name+'_bestfit as f, '+name+'_stars as sd where f.starid=sd.starid;'
-    print cmd
+    print(cmd)
     cursor.execute(cmd)
     mp=n.median(n.array(cursor.fetchall()))
-    print 'found floating zp as %f'%mp
+    print('found floating zp as %f'%mp)
     for i in n.arange(n.size(ranges)-1):
-        print k
+        print(k)
         cmd = 'SELECT sd.starID, AVG(o.starObsMag - p.dmagcal - sd.startruemag), STDDEV(o.starObsMag - p.dmagcal - sd.startruemag) from '+name+'_bestfitpatch as p, '+\
         name+' as o, '+name+'_stars as sd, '+name+'_bestfit as sb WHERE p.patchid = o.PatchID and o.starid = sd.starID and o.starid = sb.starid and %f+p.dmagcal >= %f and %f+p.dmagcal < %f GROUP BY sd.starid;'%(mp,ranges[k], mp,ranges[k+1])
-        print cmd
+        print(cmd)
         cursor.execute(cmd)
         data = n.array(cursor.fetchall())
         if n.size(data) > 1:
-            print 'size of returned data = ', n.size(data), n.shape(data)
+            print('size of returned data = ', n.size(data), n.shape(data))
             floating_zp = n.median(data[:,1])
             data[:,1]=data[:,1]-floating_zp
             nstars=len(data[:,1])
-            print 'nstars =%i'%nstars
+            print('nstars =%i'%nstars)
             good=n.where(n.abs(data[:,1]) < 0.5)
             avs=n.ravel(data[good,1])
             stds=n.ravel(data[:,2])
@@ -1486,10 +1488,10 @@ def rmsrad(name, bins=10):
                               dbtype='pgsql', username=None, passwdname=None)
 
     cmd = 'SELECT AVG(f.starmagcalib- sd.startruemag) from '+name+'_bestfit as f, '+name+'_stars as sd where f.starid=sd.starid;'
-    print cmd
+    print(cmd)
     cursor.execute(cmd)
     mp=n.median(n.array(cursor.fetchall()))
-    print 'found floating zp as %f'%mp
+    print('found floating zp as %f'%mp)
 
     cmd="SELECT max( SQRT(starx^2+stary^2)) from "+name+";"
     cursor.execute(cmd)

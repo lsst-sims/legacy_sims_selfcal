@@ -1,3 +1,5 @@
+from __future__ import print_function
+from builtins import range
 #####
 #  Lynne Jones, ljones@astro.washington.edu
 #  svn version info : $Id$
@@ -60,7 +62,7 @@ def match_stars_calvstrue(stardat, starcal, sorted=True):
             idx = idx[0][0]
             stardat['magcal'][idx] = starcal['magcal'][i]
     condition = (stardat['magcal']!=-99)
-    for key in stardat.keys():
+    for key in list(stardat.keys()):
         stardat[key] = stardat[key][condition]
     return stardat
 
@@ -73,7 +75,7 @@ def adjust_stars_calvstrue(stardat):
     stardat['magdiff'] = stardat['magdiff'] - floatzp
     meanout = stardat['magdiff'].mean()
     rms = stardat['magdiff'].std()
-    print "Before adjustment: mean %f.  After adjustment: mean %f with stdev %f" %(meanin, meanout, rms)
+    print("Before adjustment: mean %f.  After adjustment: mean %f with stdev %f" %(meanin, meanout, rms))
     #return stardat, meanin, meanout, rms
     return stardat
     
@@ -82,15 +84,15 @@ def plot_stars_dmagcaltrue(stardat, maglim=None, etitle="", newfig=True,
     adjust_stardat = False
     if maglim !=0:
         maglim=n.round(n.array(maglim)*1000, decimals=1)
-    if 'magcal' not in stardat.keys():
+    if 'magcal' not in list(stardat.keys()):
         if starcal == None:
             raise Exception("Must either pass in starcal as well, or match_calvstrue previously")
         stardat = match_calvstrue(stardat, starcal)
         adjust_stardat = True
-    if 'magdiff' not in stardat.keys():
+    if 'magdiff' not in list(stardat.keys()):
         stardat = adjust_calvstrue(stardat)
         adjust_stardat = True
-    if 'x' not in stardat.keys():
+    if 'x' not in list(stardat.keys()):
         stardat['x'], stardat['y'] = cpu.hammer_project_toxy(stardat['ra']*deg2rad,
                                                             stardat['dec']*deg2rad)
         adjust_stardat = True
@@ -129,7 +131,7 @@ def read_visitfile(visitfile='visit.dat'):
 
 def plot_visits(visits, visitlim=None, etitle="", newfig=True):
     """Plot the location of the visits across the sky. Color code by number of visits."""
-    if 'x' not in visits.keys():
+    if 'x' not in list(visits.keys()):
         visits['x'], visits['y'] = cpu.hammer_project_toxy(visits['ra']*deg2rad,
                                                           visits['dec']*deg2rad)
     gridsize = cpu.calc_gridsize(visits,binsize='fov', rad_fov=1.8)
@@ -160,7 +162,7 @@ def read_bestfit_patchfile(bestfitpatchfile='test_bestfit_Patch.dat'):
 def plot_nvisits_patch(patchdat, subpatch=None, patchlim=None, newfig=True):
     """Plot the location of the (sub)patches across the sky. Color code by number of visits.
     Also plot the number of stars observed in each patch. """
-    if 'x' not in patchdat.keys():
+    if 'x' not in list(patchdat.keys()):
         patchdat['x'], patchdat['y'] = cpu.hammer_project_toxy(patchdat['ra']*deg2rad,
                                                             patchdat['dec']*deg2rad)
     if subpatch != None:
@@ -195,7 +197,7 @@ def histogram_nstars_patch(patchdat, show_subpatch=False, newfig=True):
      
 def plot_nstars_patch(patchdat, z_method=n.mean, zlimits=None, newfig=True):
     """Plot the n.min/mean/std number of stars ever seen in a particular patch."""
-    if 'x' not in patchdat.keys():
+    if 'x' not in list(patchdat.keys()):
         patchdat['x'], patchdat['y'] = cpu.hammer_project_toxy(patchdat['ra']*deg2rad,
                                                             patchdat['dec']*deg2rad)
     gridsize = cpu.calc_gridsize(patchdat, binsize='patch')
@@ -214,9 +216,9 @@ def plot_minstars_patch(patchdat, minstars=2, subpatch=None, newfig=True):
         condition = condition & (patch['subpatch']==subpatch)
     tempx = patchdat['x'][condition]
     tempy = patchdat['y'][condition]
-    print "%f%s (%d) of the total %d patchdat have less than %f stars" \
+    print("%f%s (%d) of the total %d patchdat have less than %f stars" \
           %(float(len(tempx))/len(patchdat['nstars'])*100.0, 
-            "%s", len(tempx), len(patchdat['nstars']), minstars)
+            "%s", len(tempx), len(patchdat['nstars']), minstars))
     pyl.plot(tempx, tempy, 'k.')
     cpu.make_radec_grid(cpu.hammer_project_toxy)
     string = "Locations of patchdat with less than %d stars" %(minstars)
@@ -248,7 +250,7 @@ def match_patch_calvstrue(patchdat, patchcal, sorted=True):
             idx = idx[0][0]
             patchdat['dmagcal'][idx] = patchcal['dmagcal'][i]
     condition = (patchdat['dmagcal']!=-99)
-    for key in patchdat.keys():
+    for key in list(patchdat.keys()):
         patchdat[key] = patchdat[key][condition]
     return patchdat
 
@@ -262,8 +264,8 @@ def adjust_patch_calvstrue(patchdat):
     patchdat['magdiff'] = patchdat['magdiff'] - floatzp
     meanout = patchdat['magdiff'].mean()
     rms = patchdat['magdiff'].std()
-    print "Before adjustment: mean %f.  After adjustment of %f, find mean %f with stdev %f" \
-          %(meanin, floatzp, meanout, rms)
+    print("Before adjustment: mean %f.  After adjustment of %f, find mean %f with stdev %f" \
+          %(meanin, floatzp, meanout, rms))
     #return stardat, meanin, meanout, rms
     return patchdat
     
@@ -272,15 +274,15 @@ def plot_patch_dmagcaltrue(patchdat, maglim=None, etitle="", newfig=True,
     adjust_patchdat = False
     if maglim != None:
         maglim=n.round(n.array(maglim)*1000, decimals=1)
-    if 'dmagcal' not in patchdat.keys():
+    if 'dmagcal' not in list(patchdat.keys()):
         if patchcal == None:
             raise Exception("Must either pass in patchcal as well, or match_patch_calvstrue previously")
         patchdat = match_calvstrue(patchdat, starcal)
         adjust_patchdat = True
-    if 'magdiff' not in patchdat.keys():
+    if 'magdiff' not in list(patchdat.keys()):
         patchdat = adjust_calvstrue(patchdat)
         adjust_patchdat = True
-    if 'x' not in patchdat.keys():
+    if 'x' not in list(patchdat.keys()):
         patchdat['x'], patchdat['y'] = cpu.hammer_project_toxy(patchdat['ra']*deg2rad,
                                                             patchdat['dec']*deg2rad)
         adjust_patchdat = True
@@ -296,15 +298,15 @@ def plot_patch_nstars(patchdat, maglim=None, etitle="", newfig=True,
     adjust_patchdat = False
     if maglim != None:
         maglim=n.array(maglim)
-    if 'dmagcal' not in patchdat.keys():
+    if 'dmagcal' not in list(patchdat.keys()):
         if patchcal == None:
             raise Exception("Must either pass in patchcal as well, or match_patch_calvstrue previously")
         patchdat = match_calvstrue(patchdat, starcal)
         adjust_patchdat = True
-    if 'magdiff' not in patchdat.keys():
+    if 'magdiff' not in list(patchdat.keys()):
         patchdat = adjust_calvstrue(patchdat)
         adjust_patchdat = True
-    if 'x' not in patchdat.keys():
+    if 'x' not in list(patchdat.keys()):
         patchdat['x'], patchdat['y'] = cpu.hammer_project_toxy(patchdat['ra']*deg2rad,
                                                             patchdat['dec']*deg2rad)
         adjust_patchdat = True
@@ -317,7 +319,7 @@ def plot_patch_nstars(patchdat, maglim=None, etitle="", newfig=True,
 
 
 def plot_patch_zpoffset(patchdat, maglim=None, etitle="", newfig=True, z_method=n.mean):
-    if 'x' not in patchdat.keys():
+    if 'x' not in list(patchdat.keys()):
         patchdat['x'], patchdat['y'] = cpu.hammer_project_toxy(patchdat['ra']*deg2rad,
                                                                patchdat['dec']*deg2rad)
     gridsize = cpu.calc_gridsize(patchdat, binsize='patch')
@@ -403,7 +405,7 @@ def read_masterobsfile(masterfile='master_cal.dat', readkeys=None, count_nobs_st
             data[readkeys[i]].append(values[readcols[i]])
         if count_nobs_star:
             starid = values[keys.index('starid')]
-            if starid in count_nobs.keys():                
+            if starid in list(count_nobs.keys()):                
                 count_nobs[starid] += 1
             else:
                 count_nobs[starid] = 1
@@ -415,7 +417,7 @@ def read_masterobsfile(masterfile='master_cal.dat', readkeys=None, count_nobs_st
         return data
 
 def translate_count_nobs(count_nobs):
-    nobs_star = n.zeros(len(count_nobs.keys()), dtype='int')
+    nobs_star = n.zeros(len(list(count_nobs.keys())), dtype='int')
     i = 0
     for starid in count_nobs:
         nobs_star[i] = count_nobs[starid]

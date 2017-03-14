@@ -8,6 +8,9 @@
 # Call MakeCouds.py to generate gray absorption factor
 #_______________________________________________________________________________
 # common items
+from __future__ import print_function
+from builtins import str
+from builtins import range
 from numpy import *
 import Astrotools
 import copy
@@ -37,7 +40,7 @@ aparmf.close()
 #               
 #               Adding atmosphere parameters at appropriate MJD time 
 #
-print 'succesfully read ', len(aparmlis),'atmos parms in file : ', Atmos_parmfile
+print('succesfully read ', len(aparmlis),'atmos parms in file : ', Atmos_parmfile)
 
 #
 # extract MJD start 
@@ -64,8 +67,8 @@ for iat in range(0,natmos):
             zaer12 = float(parv.split('=')[1])
     avpl[iat] = [vis0,visamp,visaz,zaer11,zaer12]
     atpl[iat] = [aparmlis[iat].split('VIS0')[0]]
-print 'Aerosol drivers set for ' , iat, 'atmospheres'
-print 'last are :' , avpl[iat],atpl[iat]
+print('Aerosol drivers set for ' , iat, 'atmospheres')
+print('last are :' , avpl[iat],atpl[iat])
 #
 
 #_______________________________________________________________________________
@@ -100,7 +103,7 @@ headextra= ['obshistid', 'expmjd', \
 
 # identify column index of parameters to be retrieved
 
-print headextra
+print(headextra)
 
 hecolist = []
 for hh in headextra:
@@ -138,10 +141,10 @@ for ibat in range(0,39):
     ieb = isb + batsize
     obshlines = fullhlines[isb: ieb]
 #
-    print 'Succesfully read ', len(obshlines),' pointings in file : '\
-          ,LSSTdatafile 
-    print  'from  istart ',isb , obshlines[0]
-    print  '   to iend   ',ieb , obshlines[batsize-1]
+    print('Succesfully read ', len(obshlines),' pointings in file : '\
+          ,LSSTdatafile) 
+    print('from  istart ',isb , obshlines[0])
+    print('   to iend   ',ieb , obshlines[batsize-1])
 
 
       
@@ -164,7 +167,7 @@ for ibat in range(0,39):
             Declis[ipl] = float(pline[colDec])
         nend = ipl+1
         #print nend
-    print 'pointing parms extracted for  ', nend,'  pointings'
+    print('pointing parms extracted for  ', nend,'  pointings')
 # pplis contains one parameter string per LSST pointing
 # mjdlis contains MJD times of LSST pointings 
 #_______________________________________________________________________________
@@ -270,5 +273,5 @@ for ibat in range(0,39):
     for ic in range(0,nend):
         seqparmfil.write(pplis[ic])
     seqparmfil.close()
-    print nend,'parameter lines  written in batch ',expname+batextens[ibat]
-    print '       from ',pplis[0][:20], '  to ',pplis[ipoint][:20]
+    print(nend,'parameter lines  written in batch ',expname+batextens[ibat])
+    print('       from ',pplis[0][:20], '  to ',pplis[ipoint][:20])

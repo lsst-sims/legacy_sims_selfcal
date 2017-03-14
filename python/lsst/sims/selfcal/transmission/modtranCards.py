@@ -24,6 +24,10 @@ ljones@astro.washington.edu
 
 
 """
+from __future__ import print_function
+from builtins import zip
+from builtins import range
+from builtins import object
 
 import os
 import warnings
@@ -32,7 +36,7 @@ import shlex
 from copy import deepcopy
 import numpy
 
-class ModtranCards:
+class ModtranCards(object):
     """A class to set up the MODTRAN4 or 5 .tp5 input files, and run MODTRAN. """
     def __init__(self):
         """Instantiate the modtranCard object."""
@@ -154,8 +158,8 @@ class ModtranCards:
         validate against format file and store in class."""
         keys_used = []
         # Check what keys are in dictionary that we should use.
-        for parname in paramValuesDict.keys():
-            if parname in self._paramFormats.keys():
+        for parname in list(paramValuesDict.keys()):
+            if parname in list(self._paramFormats.keys()):
                 # Add to list of parameters to put into input card.
                 keys_used.append(parname)
                 # And convert to appropriate type.
@@ -166,7 +170,7 @@ class ModtranCards:
         "Pretty print the cards to the screen for debugging."""
         for run in runCards:
             for card in run:
-                print card.rstrip()
+                print(card.rstrip())
         return
 
     def writeModtranCards(self, paramValues, outfileRoot='tmp'):
@@ -239,7 +243,7 @@ class ModtranCards:
         args = shlex.split(modtranExecutable)
         # Write name of modtran .tp5 file to run, and put into mod5root.in input file.
         file = open('mod5root.in', 'w')
-        print >>file, outfileRoot
+        print(outfileRoot, file=file)
         file.close()
         # Run modtran.
         errcode = subprocess.check_call(args)
