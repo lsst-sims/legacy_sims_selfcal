@@ -1,3 +1,4 @@
+from builtins import str
 #               Module : MJDtools
 # Conversions    Modified Julian Day <-> Gregorian [Year, Month, Day, dayfract]
 #                                     ->frommjd

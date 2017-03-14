@@ -1,4 +1,5 @@
 from __future__ import print_function
+from builtins import zip
 import numpy
 import pylab
 from lsst.sims.atmosphere.clouds.Arma.ArmaSf import ArmaSf

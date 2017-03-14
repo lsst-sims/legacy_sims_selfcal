@@ -1,4 +1,5 @@
 from __future__ import print_function
+from builtins import zip
 import numpy as np
 import lsst.sims.maf.db as db
 from lsst.sims.selfcal.generation.starsTools import starsProject, assignPatches
@@ -35,7 +36,7 @@ def buildTree(simDataRa, simDataDec,
     if np.any(np.abs(simDataRa) > np.pi*2.0) or np.any(np.abs(simDataDec) > np.pi*2.0):
         raise ValueError('Expecting RA and Dec values to be in radians.')
     x, y, z = treexyz(simDataRa, simDataDec)
-    data = zip(x,y,z)
+    data = list(zip(x,y,z))
     if np.size(data) > 0:
         starTree = kdtree(data, leafsize=leafsize)
     else:
@@ -138,7 +139,7 @@ def genCatalog(visits, starsDbAddress, offsets=None, lsstFilter='r', raBlockSize
                 # Ugh, feels like writing fortran though...
                 newcols = ['x', 'y', 'radius', 'patchID', 'subPatch', 'hpID', 'hp1', 'hp2', 'hp3', 'hp4']
                 newtypes = [float, float, float, int,int, int]
-                stars = rfn.merge_arrays([stars, np.zeros(stars.size, dtype=zip(newcols,newtypes))],
+                stars = rfn.merge_arrays([stars, np.zeros(stars.size, dtype=list(zip(newcols,newtypes)))],
                                          flatten=True, usemask=False)
                 # Build a KDTree for the stars
                 starTree = buildTree(np.radians(stars['ra']),np.radians(stars['decl']) )
@@ -168,7 +169,7 @@ def genCatalog(visits, starsDbAddress, offsets=None, lsstFilter='r', raBlockSize
                     dmags[offset.newkey] = offset.run(starsIn, visit, dmags=dmags)
 
                 # Total up all the dmag's to make the observed magnitude
-                keys = dmags.keys()
+                keys = list(dmags.keys())
                 obsMag = starsIn['%smag'%lsstFilter]
                 for key in keys:
                     obsMag += dmags[key]

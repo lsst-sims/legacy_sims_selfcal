@@ -1,4 +1,5 @@
 from __future__ import print_function
+from builtins import range
 ####################################################################
 #  Written by: Peter Yoachim - UW - v1.0 10/21/10
 #  Questions or comments, email : yoachim@uw.edu
@@ -227,8 +228,8 @@ def sim2db(master_table_name, index_tag, masterfile='master_cal.dat', starfile='
 def readDict(filename):
     d=n.load(filename)
     result={}
-    for i in range(len(d.keys())):
-        result[d.keys()[i]]=d[d.keys()[i]]
+    for i in range(len(list(d.keys()))):
+        result[list(d.keys())[i]]=d[list(d.keys())[i]]
     return result
 
 #Print the corected star_obs file
@@ -786,7 +787,7 @@ def clipReweight(name, rms_clip=0.04, reweight=True, error_min=0.003):
     #clip off the high RMS stars
     condition = n.where(stardata['stds'] < rms_clip)
     print('clipping %i stars due to high RMS in repeat observations'%(n.size(stardata['stds'])-n.size(condition)))
-    for key in stardata.keys():
+    for key in list(stardata.keys()):
         stardata[key]=stardata[key][condition]
     print('got stats for %i stars'%n.size(stardata['id']))
     #find the RMS per patch
@@ -846,7 +847,7 @@ def star_out_clip(name, outclip=0.05, dbname='calsim', reweight=True):
         cmd = 'delete from '+name+' where starid = %d and patchid = %d'%(results['id'][bad[i]],results['fullpatch'][bad[i]])
         #print i,cmd
         cursor.execute(cmd)
-    for key in results.keys():
+    for key in list(results.keys()):
         results[key] = results[key][good]
     print('resulting obsfile should have %i stars in it'%(n.size(results['id'])))
     if reweight:

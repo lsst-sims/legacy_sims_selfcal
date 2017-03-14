@@ -1,4 +1,5 @@
 from __future__ import print_function
+from builtins import zip
 from lsst.sims.selfcal.solver import lsqrSolver
 from lsst.sims.selfcal.utils import fastRead
 import numpy as np
@@ -22,8 +23,8 @@ mySolver.run()
 # now to compare the results!
 
 starsFit = np.load('solvedStar.npz')['result']
-trueStars = fastRead('starInfo.dat', dtype=zip(['starID','TrueMag', 'ra','dec'],
-                                               [int,float,float,float]),
+trueStars = fastRead('starInfo.dat', dtype=list(zip(['starID','TrueMag', 'ra','dec'],
+                                               [int,float,float,float])),
                                                delimiter=',')
 trueStars.sort(order='starID')
 

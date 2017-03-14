@@ -1,11 +1,12 @@
 from __future__ import print_function
+from builtins import object
 import numpy as np
 import scipy.interpolate as interp
 
 """
 A Raft consists of a set of Detectors, each with a thermal model
 """
-class FocalplaneThermalModel:
+class FocalplaneThermalModel(object):
     def __init__(self, focalPlaneDatafile):
         self.rafts = {}
         """For each line in focalPlaneDatafile, add the corresponding raft"""
@@ -29,7 +30,7 @@ class FocalplaneThermalModel:
             return None
         
             
-class RaftThermalModel:
+class RaftThermalModel(object):
     def __init__(self, raftName, raftDataFile, raftOffset, detectorShape=(4000, 4072)):
         self.raftName = raftName
         self.raftOffset = raftOffset
@@ -74,7 +75,7 @@ class RaftThermalModel:
 A DetectorThermalModel is specified by a file with temperature points on a regularly spaced
    grid
 """
-class DetectorThermalModel:
+class DetectorThermalModel(object):
     def __init__(self, shape, dataFile, offset):
         self.shape = shape
         self.offset = offset

@@ -1,4 +1,6 @@
 from __future__ import print_function
+from builtins import zip
+from builtins import range
 import os
 import pylab
 import lsst.sims.atmosphere.transmission.modtranCards as mc

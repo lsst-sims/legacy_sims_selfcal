@@ -1,4 +1,6 @@
 from __future__ import print_function
+from builtins import zip
+from builtins import range
 ####################################################################
 #  Written by: Lynne Jones - UW - v1.1 5/21/10
 #  Questions or comments, email : ljones@astro.washington.edu
@@ -1004,7 +1006,7 @@ def createVisitErrors(visits, zp_max, zp_grad_max, colterm_max, colterm_rad_max,
     # Add the new columns needed
     names = ['zpOff', 'zpGrad', 'zpGradDir', 'colorterm', 'colortermRad',
              'flatPhase','filterPosition', 'angles','filterXoff', 'filterYoff' ]
-    visits= rfn.merge_arrays([visits, np.zeros(nvisits, dtype=zip(names,[float]*len(names)))],
+    visits= rfn.merge_arrays([visits, np.zeros(nvisits, dtype=list(zip(names,[float]*len(names))))],
                              flatten=True, usemask=False)
     
     # Generate flat distribution of random zeropoint offsets between zero and zp_max. 
@@ -1252,7 +1254,7 @@ def generateStarMags(visits, ra_min, ra_max, dec_min, dec_max, mag_min, mag_max,
             cols.append(col)
     stars = msrgbDB.tables['stars'].query_columns_Array(colnames=cols, constraint=sqlwhere)
     nstars = np.size(stars)
-    stars = rfn.merge_arrays([stars, np.zeros(nstars, dtype=zip(['id'],[float]))],
+    stars = rfn.merge_arrays([stars, np.zeros(nstars, dtype=list(zip(['id'],[float])))],
                              flatten=True, usemask=False)
     stars['id'] = np.arange(nstars)+id_start
     id_start += nstars
@@ -1326,7 +1328,7 @@ def generateStarMags(visits, ra_min, ra_max, dec_min, dec_max, mag_min, mag_max,
     if variability:
         sub_variability = variability.copy()
         stars_in_visit=np.in1d(variability['id'], stars['id'])
-        for key in sub_variability.keys():
+        for key in list(sub_variability.keys()):
             sub_variability[key]=sub_variability[key][stars_in_visit]
     # Go through each visit in block & calculate what stars fall within fov and where (rough x/y).
     for visitN in range(0, len(blockvisits['ra'])):
@@ -1339,7 +1341,7 @@ def generateStarMags(visits, ra_min, ra_max, dec_min, dec_max, mag_min, mag_max,
         condition = (starDist < rad_fov_deg)
         # Pull out the stars within this field of view - these are still arrays.
         starsFOV = {}
-        for key in stars.keys():
+        for key in list(stars.keys()):
             starsFOV[key] = stars[key][condition]
         # Asign the stars to a HEALpixel
         #HPdec = (decCen+90.)*deg2rad
@@ -1582,7 +1584,7 @@ def generateStarMags(visits, ra_min, ra_max, dec_min, dec_max, mag_min, mag_max,
                               (starsFOV['ccd_Name'] != '') )
 
 
-        for key in starsFOV.keys():
+        for key in list(starsFOV.keys()):
             if key != 'night': #wtf, why didn't I make this the same length as everything else?
                 starsFOV[key]=starsFOV[key][condition]
         # Calculate patch data for comparison to output of selfcal solver

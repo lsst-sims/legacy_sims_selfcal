@@ -9,6 +9,8 @@
 #_______________________________________________________________________________
 # common items
 from __future__ import print_function
+from builtins import str
+from builtins import range
 from numpy import *
 import Astrotools
 import copy

@@ -25,6 +25,9 @@ ljones@astro.washington.edu
 
 """
 from __future__ import print_function
+from builtins import zip
+from builtins import range
+from builtins import object
 
 import os
 import warnings
@@ -33,7 +36,7 @@ import shlex
 from copy import deepcopy
 import numpy
 
-class ModtranCards:
+class ModtranCards(object):
     """A class to set up the MODTRAN4 or 5 .tp5 input files, and run MODTRAN. """
     def __init__(self):
         """Instantiate the modtranCard object."""
@@ -155,8 +158,8 @@ class ModtranCards:
         validate against format file and store in class."""
         keys_used = []
         # Check what keys are in dictionary that we should use.
-        for parname in paramValuesDict.keys():
-            if parname in self._paramFormats.keys():
+        for parname in list(paramValuesDict.keys()):
+            if parname in list(self._paramFormats.keys()):
                 # Add to list of parameters to put into input card.
                 keys_used.append(parname)
                 # And convert to appropriate type.

@@ -5,6 +5,7 @@ Set of functions to convert between Modified Julian Date (MJD) and Gregorian dat
 Also a function getSeason that returns the season (as an int, cf. function) for a
 given MJD.
 """
+from builtins import zip
 import numpy as np
 import datetime
 

@@ -1,6 +1,7 @@
+from builtins import object
 import numpy
 
-class TotalCloudExtinction():
+class TotalCloudExtinction(object):
     '''This class is used to generate total cloud extinction for a set of pointings, using appropriate
     long-term weather trends to generate this extinction.
     Based on data from XXXXX '''

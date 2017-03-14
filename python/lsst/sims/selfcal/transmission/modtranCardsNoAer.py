@@ -28,6 +28,9 @@ ljones@astro.washington.edu
 
 """
 from __future__ import print_function
+from builtins import zip
+from builtins import range
+from builtins import object
 
 import os
 import subprocess
@@ -125,7 +128,7 @@ class ModtranCards(object):
             # The first item is the observation ID name
             paramValuesDict['id'] = tmpvalues[0].strip()
             # The other values are keyword-value pairs.
-            for i in xrange(1, len(tmpvalues)):
+            for i in range(1, len(tmpvalues)):
                 # Avoid entries which aren't actually key-value pairs (like the
                 # newline at the end of the line)
                 if (len(tmpvalues[i]) < 3):
@@ -170,8 +173,8 @@ class ModtranCards(object):
         the modtran card, validate against format file and store in class."""
         keys_used = []
         # Check what keys are in dictionary that we should use.
-        for parname in paramValuesDict.keys():
-            if parname in self._paramFormats.keys():
+        for parname in list(paramValuesDict.keys()):
+            if parname in list(self._paramFormats.keys()):
                 # Add to list of parameters to put into input card.
                 keys_used.append(parname)
                 # And convert to appropriate type.

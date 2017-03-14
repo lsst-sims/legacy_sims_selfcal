@@ -6,6 +6,7 @@
 ###
 
 from __future__ import print_function
+from builtins import str
 import sys
 
 import numpy as np
@@ -26,7 +27,7 @@ deg2rad = np.pi/180.0
 def dictsort(indict,key):
     """for a dictionary of numpy arrays.  Normally, one would just use record arrays and np.sort(array,order=key) """
     order = np.argsort(indict[key])
-    for key in indict.keys():
+    for key in list(indict.keys()):
         indict[key] = indict[key][order]
     return indict
 
@@ -108,9 +109,9 @@ def starPlots(truestarfile = "stardata.dat", bestfitstarfile = "test_bestfit_Sta
         starcal = ui.readDatafile(bestfitstarfile, keys=('id','magcal'))
         HP = False                     
     fitted_stars = np.in1d(stardat['id'], starcal['id'])
-    for key in stardat.keys():
+    for key in list(stardat.keys()):
         stardat[key] = stardat[key][fitted_stars]
-    for key in starcal.keys():
+    for key in list(starcal.keys()):
         stardat[key] = starcal[key]
     stardat['magdiff'] = stardat['magcal'] - stardat['magtrue']
     stardat = cp.adjust_stars_calvstrue(stardat)
@@ -363,7 +364,7 @@ def starPlots(truestarfile = "stardata.dat", bestfitstarfile = "test_bestfit_Sta
 
 
 def printdict(dict):
-    for key in dict.keys():
+    for key in list(dict.keys()):
         if type(dict[key]) is int:
             print(str(dict[key])+'    '+ key)
         else:

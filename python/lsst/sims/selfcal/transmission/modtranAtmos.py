@@ -17,6 +17,8 @@ List of parameters that can be output :
  zaer21, zaer22        - Higher aerosol layer
  scale2                - Scale for higher aerosol layer
 """
+from builtins import range
+from builtins import object
 import numpy
 import scipy
 import os
@@ -232,7 +234,7 @@ class Atmosphere(object):
         ivulc = numpy.zeros_like(self.mjd_arr, dtype='int')
         tstart = numpy.random.uniform(self.mjds, self.mjde - 60, n)
         tend = tstart + numpy.random.uniform(0, 50)
-        for i in xrange(n):
+        for i in range(n):
             ivulc += numpy.where((self.mjd_arr >= tstart[i]) &
                                 (self.mjd_arr < tend[i]), 2, 0)
         ivulc[numpy.where(ivulc > 2)] = 2

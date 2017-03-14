@@ -16,11 +16,12 @@ The structure function is not generated here - any function which is described i
 """
 from __future__ import print_function
 from __future__ import absolute_import
+from builtins import object
 
 import numpy
 from .pImage import PImage
 
-class Clouds():
+class Clouds(object):
     def __init__(self):
         return
 

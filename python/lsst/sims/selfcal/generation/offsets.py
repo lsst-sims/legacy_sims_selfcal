@@ -1,3 +1,5 @@
+from builtins import zip
+from builtins import object
 import numpy as np
 import numpy.lib.recfunctions as rfn
 from lsst.sims.selfcal.clouds.Arma import ArmaSf, Clouds
@@ -17,7 +19,7 @@ class NoOffset(BaseOffset):
         """ Make no changes to the mags """
         self.newkey = 'dmag_zero'
     def run(self, stars,visits, **kwargs):
-        dmag = np.zeros(stars.size, dtype=zip([self.newkey],[float]))
+        dmag = np.zeros(stars.size, dtype=list(zip([self.newkey],[float])))
         return dmag
 
 class OffsetSys(BaseOffset):
@@ -100,7 +102,7 @@ class OffsetSNR(BaseOffset):
         # calc what magnitude the star has when it hits the silicon. Thus we compute the SNR noise
         # AFTER things like cloud extinction and vingetting.
 
-        for key in dmags.keys():
+        for key in list(dmags.keys()):
             temp_mag = temp_mag + dmags[key]
         dmag = self.calcMagErrors(temp_mag, m5 = visit['fiveSigmaDepth'] )
         return dmag

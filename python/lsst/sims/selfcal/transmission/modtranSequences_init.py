@@ -1,10 +1,11 @@
+from builtins import object
 #####
 #  Class used to generate sequences of atmospheric parameters for input to MODTRAN.
 ###
 
 import numpy
 
-class AtmosphereSequences():
+class AtmosphereSequences(object):
     """
     This class is used to generate sequences of atmospheric parameters, matching long-term weather trends,
     and accounting for the airmass/pointing location of each observation. These atmospheric parameters are the

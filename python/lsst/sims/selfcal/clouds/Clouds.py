@@ -1,12 +1,15 @@
 from __future__ import print_function
 from __future__ import absolute_import
+from builtins import str
+from builtins import range
+from builtins import object
 import os
 import numpy
 from scipy import interpolate, fftpack
 from .PowerSpectrum import PowerSpectrum
 from pylab import rms_flat
 
-class Clouds:    
+class Clouds(object):    
     def __init__(self, ws, s):
         # set the half-diagonal size of the 2D Fourier space equal to the maximum frequency of the 1D power spectrum
         self.windowsize = ws/numpy.sqrt(2.)

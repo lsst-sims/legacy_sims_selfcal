@@ -1,4 +1,5 @@
 from __future__ import print_function
+from builtins import range
 import numpy as np
 import time 
 import pylab as pyl
@@ -94,7 +95,7 @@ pr=np.searchsorted(starobs['patchid'], patchfit['patchid'], side='right')
 
 print('constructing zeropoint array')
 zparray=starobs['obsmag']*0
-for i in xrange(np.size(pl)):
+for i in range(np.size(pl)):
     if pl[i] != pr[i]:
         zparray[pl[i]:pr[i]]=zparray[pl[i]:pr[i]]+patchfit['zp'][i]
 
@@ -116,7 +117,7 @@ print('starting search sorted right')
 right=np.searchsorted(starobs['starid'], ids,'right')
 
 print('computing stdev for each star')
-for i in xrange(np.size(ids)):
+for i in range(np.size(ids)):
     stds[i]=starobs['obsmag'][left[i]:right[i]].std()
 
 print('median RMS per star', np.median(stds))

@@ -1,3 +1,5 @@
+from builtins import str
+from builtins import range
 #"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 #"""                                                                   """
 #"""                shape_store_spectra.py                                                   """

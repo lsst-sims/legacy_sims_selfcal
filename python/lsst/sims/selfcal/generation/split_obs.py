@@ -1,4 +1,7 @@
 from __future__ import print_function
+from future import standard_library
+standard_library.install_aliases()
+from builtins import range
 import numpy as np
 import matplotlib
 #matplotlib.use('Agg')
@@ -15,7 +18,7 @@ from scipy import stats
 def dictsort(indict,key):
     """for a dictionary of numpy arrays.  Normally, one would just use record arrays and np.sort(array,order=key) """
     order = np.argsort(indict[key])
-    for key in indict.keys():
+    for key in list(indict.keys()):
         indict[key] = indict[key][order]
     return indict
 
@@ -95,7 +98,7 @@ def split_obs(nside,shift_size=5., splitNS=False, NorthOnly=False, SouthOnly=Fal
     patchdat = ui.readDatafile(patchfile, keys)
 
     ord = np.argsort(patchdat['patchid'])
-    for key in patchdat.keys():  patchdat[key]=patchdat[key][ord]
+    for key in list(patchdat.keys()):  patchdat[key]=patchdat[key][ord]
 
     shift_size = shift_size*np.pi/180. #1.*np.pi/180.
 
@@ -279,11 +282,11 @@ def patch_combine():
         patchdat['healid'].append(np.ravel(temp['patchid']*0+heal_num))
         patchdat['patchmag'].append(np.ravel(temp['patchmag']))
 
-    for key in patchdat.keys():
+    for key in list(patchdat.keys()):
         patchdat[key] = np.concatenate(patchdat[key])
 
     ord = np.argsort(patchdat['healid'])
-    for key in patchdat.keys():
+    for key in list(patchdat.keys()):
         patchdat[key] = patchdat[key][ord]
 
     file = open('patch_obs.dat', 'w')
@@ -317,11 +320,11 @@ def finalPatch(solver):
         patchdat['healid'].append(np.ravel(temp['patchid']*0+heal_num))
         patchdat['patchmag'].append(np.ravel(temp['patchmag']))
 
-    for key in patchdat.keys():
+    for key in list(patchdat.keys()):
         patchdat[key] = np.concatenate(patchdat[key])
 
     ord = np.argsort(patchdat['healid'])
-    for key in patchdat.keys():
+    for key in list(patchdat.keys()):
         patchdat[key] = patchdat[key][ord]
 
     keys=('hpid','hpzp')
@@ -411,11 +414,11 @@ def illum_combine():
         patchdat['illumid'].append(np.ravel(temp_so['illumid']))
         patchdat['patchmagerr'].append(np.ravel(temp_so['patchmagerr']))
 
-    for key in patchdat.keys():
+    for key in list(patchdat.keys()):
         patchdat[key] = np.concatenate(patchdat[key])
 
     ord = np.argsort(patchdat['healid'])
-    for key in patchdat.keys():
+    for key in list(patchdat.keys()):
         patchdat[key] = patchdat[key][ord]
 
     file = open('patch_obs.dat', 'w')
@@ -448,7 +451,7 @@ def finalStar_bad():
         temp['starmag'] = temp['starmag'] - healzp['healmag'][i] - fp['mag']
         stardat['starid'].append(np.ravel(temp['starid']))
         stardat['starmag'].append(np.ravel(temp['starmag']))
-    for key in stardat.keys():
+    for key in list(stardat.keys()):
         stardat[key] = np.concatenate(stardat[key])
 
     #Crap, looks like there's more jitter solution-to-solution than I expected.  might need to go back through the star_obs.dat file after all
@@ -457,7 +460,7 @@ def finalStar_bad():
     #sd = np.core.records.fromarrays(stardat['starid'], stardat['starmag'],names='starid,starmag' )
     #sd.sort(order='starid')
     order = np.argsort(stardat['starid'])
-    for key in stardat.keys():
+    for key in list(stardat.keys()):
         stardat[key] = stardat[key][order]
     uid = np.unique(stardat['starid'])
     left = np.searchsorted(stardat['starid'],uid)
@@ -479,14 +482,14 @@ def finalStar(infile='star_obs.dat', outfile='test_bestfit_Star.dat'):
     star_obs = ui.readDatafile(infile, ('patchid','starid','starmag','starerr'),
                                keytypes=('u8','u8','float','float'))
     order = np.argsort(star_obs['patchid'])
-    for key in star_obs.keys():
+    for key in list(star_obs.keys()):
         star_obs[key] = star_obs[key][order]
     left = np.searchsorted(star_obs['patchid'], patchzp['patchid'])
     right = np.searchsorted(star_obs['patchid'], patchzp['patchid'], side='right')
     for i in np.arange(left.size):
         star_obs['starmag'][left[i]:right[i]] = star_obs['starmag'][left[i]:right[i]] - patchzp['patchzp'][i]
     order = np.argsort(star_obs['starid'])
-    for key in star_obs.keys():
+    for key in list(star_obs.keys()):
         star_obs[key] = star_obs[key][order]
     ustar = np.unique(star_obs['starid'])
     mag = np.zeros(ustar.size, dtype='float')
@@ -528,10 +531,10 @@ def finalStarP(infiles='h*star_obs.dat', outfile='test_bestfit_Star.dat', outsta
         star_obs = ui.readDatafile(files[i], ('patchid','starid','starmag','starerr','fppatch','hp'),
                                    keytypes=('u8','u8','float','float','u8','u8'))
         in_hp = np.where(star_obs['hp'] == hps[i])#crop down to just those stars in the center HP
-        for key in star_obs.keys():
+        for key in list(star_obs.keys()):
             star_obs[key] = star_obs[key][in_hp]
         order = np.argsort(star_obs['patchid'])
-        for key in star_obs.keys():
+        for key in list(star_obs.keys()):
             star_obs[key] = star_obs[key][order]
 
         left = np.searchsorted(star_obs['patchid'], patchzp['patchid'])
@@ -540,7 +543,7 @@ def finalStarP(infiles='h*star_obs.dat', outfile='test_bestfit_Star.dat', outsta
             star_obs['starmag'][left[i]:right[i]] = star_obs['starmag'][left[i]:right[i]] - patchzp['patchzp'][i]
 
         order = np.argsort(star_obs['fppatch'])
-        for key in star_obs.keys():
+        for key in list(star_obs.keys()):
             star_obs[key] = star_obs[key][order]
         left = np.searchsorted(star_obs['fppatch'], illumzp['illumid'])
         right = np.searchsorted(star_obs['fppatch'], illumzp['illumid'], side='right')
@@ -549,7 +552,7 @@ def finalStarP(infiles='h*star_obs.dat', outfile='test_bestfit_Star.dat', outsta
         
         
         order = np.argsort(star_obs['starid'])
-        for key in star_obs.keys():
+        for key in list(star_obs.keys()):
             star_obs[key] = star_obs[key][order]
         ustar = np.unique(star_obs['starid'])
         left = np.searchsorted( star_obs['starid'], ustar)

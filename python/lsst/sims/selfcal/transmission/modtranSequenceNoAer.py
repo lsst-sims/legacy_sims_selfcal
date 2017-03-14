@@ -48,6 +48,8 @@ Need to check if MODTRAN output wavelengths are the same for version 4 and 5
 
 """
 from __future__ import print_function
+from builtins import range
+from builtins import object
 
 import numpy
 import os
@@ -115,7 +117,7 @@ class AtmosphereSequence(object):
                     data = visit.strip().split()
                     visitDict = {}
                     visitDict[_opsim_keys[0]] = int(data[0])
-                    for i in xrange(1, len(data)):
+                    for i in range(1, len(data)):
                         visitDict[_opsim_keys[i]] = float(data[i])
                     self.opsim_visits.append(visitDict)
         else:
@@ -241,7 +243,7 @@ class AtmosphereSequence(object):
         # Set the name of MODTRAN output file
         self.outfilename = outfile
         # Loop over the MODTRAN runs
-        for run in xrange(len(self.modtran_visits)):
+        for run in range(len(self.modtran_visits)):
             self.runModtran(run)
             # Read MODTRAN output
             modtrans = self.getModtranExtinction()
@@ -319,9 +321,9 @@ class AtmosphereSequence(object):
         outputpath = os.path.join(modtranDataDir, outputfile)
         with open(outputpath, 'w') as transmf:
             transmf.write('$ FINAL ATMOSPHERE TRANSMISSION\n')
-            for val in xrange(len(self.modtran_wl)):
+            for val in range(len(self.modtran_wl)):
                 data = '\t'.join('{0:f}'.format(self.transmittance[run][val])
-                                 for run in xrange(len(self.modtran_wl)))
+                                 for run in range(len(self.modtran_wl)))
                 line = '{0}\t{1}\n'.format(self.modtran_wl[val], data)
                 transmf.write(line)
 

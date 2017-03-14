@@ -1,4 +1,6 @@
 from __future__ import print_function
+from builtins import range
+from builtins import object
 #####
 #  Lynne Jones, ljones@astro.washington.edu.
 #
@@ -44,7 +46,7 @@ maxexpmjd = 53003.
 midnight = 0.666
 
 
-class InputOutput:
+class InputOutput(object):
 
     def __init__(self):
         """Initialize input/output class. 

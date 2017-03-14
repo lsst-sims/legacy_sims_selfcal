@@ -23,6 +23,8 @@ are the ones practical for atmospheric transmission usage.
  
 """
 from __future__ import print_function
+from builtins import range
+from builtins import object
 
 import os
 from copy import deepcopy
@@ -40,7 +42,7 @@ RAD2DEG = 180.0/numpy.pi
 colors = ('b', 'm', 'r', 'g', 'y', 'k')
 
 
-class AtmoComp:
+class AtmoComp(object):
     """Class for reading modtran component files and building an atmosphere."""    
     def __init__(self):
         # lists of the atmospheric components
@@ -351,7 +353,7 @@ class AtmoComp:
         f = open(filename, 'w')
         print("# Test atmosphere ", file=f)
         print("# Airmass = %.3f" %(self.secz), file=f)
-        for coeff in self.C.keys():
+        for coeff in list(self.C.keys()):
             print("# Coefficient: C['%s'] = %f" %(coeff, self.C[coeff]), file=f)
         for i in range(len(self.wavelen)):
             print("%.3f  %.8f" %(self.wavelen[i], self.trans_total[i]), file=f)

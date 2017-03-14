@@ -1,4 +1,5 @@
 from __future__ import print_function
+from builtins import range
 #============================================================================
 #
 #               Library : Meteotools
@@ -131,7 +132,7 @@ def mtssmooth(ttmtl):
 
 def sinexp(arg):
         nabs = arg[0]
-        tt=range(nabs)
+        tt=list(range(nabs))
         tlims = arg[1]
         tstep = (tlims[0][1]-tlims[0][0]) / nabs
         tt=array(tt) * tstep
@@ -163,7 +164,7 @@ def sinexp(arg):
 
 def sinexps(arg):
         nabs = arg[0]
-        tt=range(nabs)
+        tt=list(range(nabs))
         tlims = arg[1]
         tstep = (tlims[0][1]-tlims[0][0]) / nabs
         tt=array(tt) * tstep

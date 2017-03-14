@@ -32,6 +32,9 @@ function of the Atmosphere class
 """
 from __future__ import print_function
 from __future__ import absolute_import
+from builtins import zip
+from builtins import range
+from builtins import object
 
 import numpy as np
 import os
@@ -100,7 +103,7 @@ class AtmosphereSequence(object):
                     data = visit.strip().split()
                     visitDict = {}
                     visitDict[_opsim_keys[0]] = int(data[0])
-                    for i in xrange(1, len(data)):
+                    for i in range(1, len(data)):
                         visitDict[_opsim_keys[i]] = float(data[i])
                     self.opsim_visits.append(visitDict)
             self._initialized_visits = True
@@ -167,7 +170,7 @@ class AtmosphereSequence(object):
             self.mjds, self.mjde, self.npoints, seed)
         self.atmos.init_main_parameters()
         for opsim_dict, idx in zip(self.opsim_visits,
-                                   xrange(len(self.opsim_visits))):
+                                   range(len(self.opsim_visits))):
             modtran_dict = self.fillModtranDictionary(opsim_dict, idx)
             self.modtran_visits.append(modtran_dict)
 

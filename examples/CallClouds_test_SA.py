@@ -1,3 +1,5 @@
+from builtins import str
+from builtins import range
 # -*- coding: cp1252 -*-
 #==============================================================================
 #

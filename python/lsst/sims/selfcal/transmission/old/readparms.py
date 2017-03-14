@@ -1,4 +1,5 @@
 from __future__ import print_function
+from builtins import range
 # read a catalogue of MODTRAN parameters with their
 #  name, format, card sequential number, range in card
 # return a list with parameters attributes

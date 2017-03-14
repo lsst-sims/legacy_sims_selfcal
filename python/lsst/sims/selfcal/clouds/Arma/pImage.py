@@ -1,8 +1,9 @@
 from __future__ import print_function
+from builtins import object
 import numpy
 from scipy import fftpack
 
-class PImage():
+class PImage(object):
     def __init__(self, shift=True, nx=1000, ny=1000):
         """Init. Does nothing."""
         if (nx%2 != 0) | (ny%2 !=0):
