@@ -1,3 +1,4 @@
+from __future__ import print_function
 import numpy
 import pylab
 from lsst.sims.atmosphere.clouds.Arma.ArmaSf import ArmaSf
@@ -57,10 +58,10 @@ for kappa, c in zip(kappa, c):
     cloud.makeCloudImage(sftheta, sfsf, kappa, fov=3.0, pixscale=pixscale, oversample=1.0)
     #cloud.plotCloudImage()
     dt, t = dtime(t)
-    print '# To generate next cloud image: %f seconds' %(dt)
+    print('# To generate next cloud image: %f seconds' %(dt))
 
 #pylab.show()
 
 # At each point, the cloud image itself is cloud.cloudimage and has size as below: 
-print '# Size of cloud images being generated:', numpy.shape(cloud.cloudimage)
+print('# Size of cloud images being generated:', numpy.shape(cloud.cloudimage))
 

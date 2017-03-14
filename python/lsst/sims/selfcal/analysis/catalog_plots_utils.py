@@ -1,3 +1,4 @@
+from __future__ import print_function
 #####
 #  Lynne Jones, ljones@astro.washington.edu
 #  svn version info : $Id$
@@ -76,7 +77,7 @@ def hammer_project_toxy(ra, dec, raCen=0, decCen=0):
     if (ra.shape[0]!=dec.shape[0]):
         raise Exception("Expect lon and lat input to hammer_project_toxy to be same length.")
     if decCen!=0:
-        print "Ignoring decCen=0; this is a hammer projection (decCen=0 automatically)."
+        print("Ignoring decCen=0; this is a hammer projection (decCen=0 automatically).")
     rt2=n.sqrt(2.0)
     # wrap longitude so lonCen is at center, and appropriately phased for cosine
     # (i.e. lon 0-360 must go to -180 to 180, with 0 at center.)
@@ -93,7 +94,7 @@ def hammer_project_tosky(x, y, raCen=0, decCen=0):
     if (x.shape[0]!=y.shape[0]):
         raise Exception("Expect x and y to hammer_project_tosky to be the same length.")
     if decCen!=0:
-        print "Ignoring decCen, setting =0 as this is a hammer projection."
+        print("Ignoring decCen, setting =0 as this is a hammer projection.")
     z = n.sqrt(1 - (x/4.0)**2 - (y/2.0)**2)
     ra = 2 * n.arctan2(z*x, (2*(2*z**2 - 1))) + raCen
     ra = wrapRA(ra)
@@ -228,7 +229,7 @@ def calc_gridsize(data=None, binsize='fov', rad_fov=1.8, patches_per_side=4):
         gridsizex = round(360. / bin_len)
         gridsizey = round(90. / bin_len)
     gridsize = [int(gridsizex), int(gridsizey)]
-    print 'gridsizes=', gridsize
+    print('gridsizes=', gridsize)
     return gridsize
 
 

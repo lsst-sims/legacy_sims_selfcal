@@ -1,3 +1,4 @@
+from __future__ import print_function
 import numpy as np
 import re
 
@@ -15,7 +16,7 @@ def fastRead(infilename, dtype,
     # Open file.
     f = open(infilename, 'r')
     if verbose:
-        print "# Reading file %s" %(infilename)
+        print("# Reading file %s" %(infilename))
     # Read data from file.
     value = []
     for line in f:

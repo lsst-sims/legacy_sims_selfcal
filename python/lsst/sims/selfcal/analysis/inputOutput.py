@@ -1,3 +1,4 @@
+from __future__ import print_function
 #####
 #  Lynne Jones, ljones@astro.washington.edu.
 #
@@ -91,7 +92,7 @@ class InputOutput:
                 self.engine = create_engine('%s+%s://%s:%s@%s/%s' %(self.dbtype, self.driver, self.username, self.password, 
                                                                      self.hostname, self.database), echo=verbose)   
         if verbose:
-            print "Connected to %s database %s as %s." %(self.dbtype, self.database, self.username)    
+            print("Connected to %s database %s as %s." %(self.dbtype, self.database, self.username))    
         self.conn = self.engine.connect()
         return 
 
@@ -101,15 +102,15 @@ class InputOutput:
             self.conn.close()
         except AttributeError:
             if verbose:
-                print '# No connection existed to close.'
+                print('# No connection existed to close.')
         if verbose:
-            print '# Closed connection to database.'
+            print('# Closed connection to database.')
         return
 
     def sqlQuery(self, query, verbose=True):
         """Send query to db table, return results."""
         if verbose:
-            print '#', query
+            print('#', query)
         # Execute query.
         resultproxy = self.conn.execute(query)
         sqlresults = resultproxy.fetchall()
@@ -124,7 +125,7 @@ class InputOutput:
             if ((kt=='string') | (kt=='str')):
                 kt = 'char(%d)' %(stringlength)
                 if verbose:
-                    print '#! Warning - heads up, using strings of length %d' %(stringlength)
+                    print('#! Warning - heads up, using strings of length %d' %(stringlength))
         query = 'create table %s (' %(table)    
         for i in range(len(keys)):  
             query = query + '%s %s, ' %(keys[i], keytypes[i])
@@ -133,7 +134,7 @@ class InputOutput:
         # Close the parenthesis.
         query = query + ')'
         if verbose:
-            print '# %s' %(query)
+            print('# %s' %(query))
         # Begin transaction. 
         trans = self.conn.begin()
         self.conn.execute(query)
@@ -168,7 +169,7 @@ class InputOutput:
                 self.conn.execute(query)
         trans.commit()
         if verbose:
-            print "# Updated table %s with %s rows of data" %(table, data_len)
+            print("# Updated table %s with %s rows of data" %(table, data_len))
         return
 
     def sqlCreateIndexes(self, table, keys_to_index, verbose=True):
@@ -176,7 +177,7 @@ class InputOutput:
         for k in keys_to_index:
             query = 'create index %s_idx on %s (%s)' %(k, table, k)
             if verbose:
-                print '# %s' %(query)
+                print('# %s' %(query))
             self.conn.execute(query)
         return
 
@@ -206,7 +207,7 @@ class InputOutput:
             if datatype[key] == str:
                 value[key] = numpy.empty((arraylen,), dtype=(datatype[key], stringlength))
                 if verbose:
-                    print '#! Warning - heads up - using strings of length %d' %(stringlength)
+                    print('#! Warning - heads up - using strings of length %d' %(stringlength))
             else:
                 value[key] = numpy.empty((arraylen,), dtype=datatype[key])
         # Start assigning sql query results.
@@ -253,7 +254,7 @@ class InputOutput:
         # Attempt to open file.
         f = open(infilename, 'r')
         if verbose:
-            print "# Reading file %s" %(infilename)
+            print("# Reading file %s" %(infilename))
         # Read data from file.
         value = {}
         for key in keys:
@@ -296,20 +297,20 @@ class InputOutput:
             try:
                 fout = open(outfilename, 'w')
             except IOError:
-                print >>sys.stderr, "Couldn't open new file %s" %(outfilename)
+                print("Couldn't open new file %s" %(outfilename), file=sys.stderr)
                 return
         else:
             try:
                 fout = open(outfilename, 'a')
             except IOError:
-                print >>sys.stderr, "Couldn't open file %s for appending." %(outfilename)
+                print("Couldn't open file %s for appending." %(outfilename), file=sys.stderr)
                 return
         # Print header information if desired.
         if printheader: 
             writestring = "# "
             for key in keys:
                 writestring = writestring + " %s" %(key)
-            print >>fout, writestring
+            print(writestring, file=fout)
         # Print data information.
         for i in range(len(data[keys[0]])):
             writestring = ""
@@ -318,7 +319,7 @@ class InputOutput:
             # Trim trailing white space.
             writestring = writestring[:-1]
             # Done constructing write line.
-            print >>fout, writestring
+            print(writestring, file=fout)
         # Done writing data.
         fout.close()
         return 

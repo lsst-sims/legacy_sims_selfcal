@@ -47,6 +47,7 @@ Need to check if MODTRAN output wavelengths are the same for version 4 and 5
 => cf. modwl.txt
 
 """
+from __future__ import print_function
 
 import numpy
 import os
@@ -109,7 +110,7 @@ class AtmosphereSequence(object):
             with open(opsimfile, 'r') as opsim:
                 for visit in opsim:
                     if visit.startswith('o'):
-                        print visit
+                        print(visit)
                         continue
                     data = visit.strip().split()
                     visitDict = {}
@@ -230,8 +231,8 @@ class AtmosphereSequence(object):
         self.aerosol_visits = data[1]
         # seed value
         nruns = len(self.modtran_visits)
-        print 'Parameters for {1} runs computed with seed = {0}'.format(data[2],
-                                                                        nruns)
+        print('Parameters for {1} runs computed with seed = {0}'.format(data[2],
+                                                                        nruns))
         # Init transmission array
         self.initTransmissionArray(nruns)
 

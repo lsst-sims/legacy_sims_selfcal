@@ -1,3 +1,4 @@
+from __future__ import print_function
 import numpy as np
 import matplotlib
 #matplotlib.use('Agg')
@@ -65,17 +66,17 @@ def print_obsfile(ofile, starobs_output="star_obs.dat", stars=None, subpatch=Fal
     if ofile==None:
         ofile = open(starobs_output, 'w')
         #if subpatch:
-        print >>ofile, "%s %s %s %s %s" %("#PatchID", "StarID", "StarObsMag", "StarMagObsErr", "FpPatchID")
+        print("%s %s %s %s %s" %("#PatchID", "StarID", "StarObsMag", "StarMagObsErr", "FpPatchID"), file=ofile)
         #else:
         #    print >>ofile, "%s %s %s %s" %("#PatchID", "StarID", "StarObsMag", "StarMagObsErr")
     if stars!=None:
         for obj in range(0, len(stars['id'])):
             if subpatch:
-                print >>ofile, "%d  %d  %f  %f %d" %(stars['fullpatch'][obj], stars['id'][obj],
-                                                  stars['rmagobs'][obj], stars['magerr'][obj], stars['illum_patch'][obj]) #stars['subpatch'][obj])#
+                print("%d  %d  %f  %f %d" %(stars['fullpatch'][obj], stars['id'][obj],
+                                                  stars['rmagobs'][obj], stars['magerr'][obj], stars['illum_patch'][obj]), file=ofile) #stars['subpatch'][obj])#
             else:
-                print >>ofile, "%d  %d  %f  %f %d" %(stars['fullpatch'][obj], stars['id'][obj],
-                                                  stars['rmagobs'][obj], stars['magerr'][obj], 0)
+                print("%d  %d  %f  %f %d" %(stars['fullpatch'][obj], stars['id'][obj],
+                                                  stars['rmagobs'][obj], stars['magerr'][obj], 0), file=ofile)
     return ofile
 
 def split_obs(nside,shift_size=5., splitNS=False, NorthOnly=False, SouthOnly=False, blocksize=1e6):
@@ -177,7 +178,7 @@ def split_obs(nside,shift_size=5., splitNS=False, NorthOnly=False, SouthOnly=Fal
         
 
 
-    print 'reading star_obs.dat.s'
+    print('reading star_obs.dat.s')
     star_obs = open('star_obs.dat.s', 'r')
     #read in just the patch id's from star_obs
     all_patch_ids = []
@@ -200,10 +201,10 @@ def split_obs(nside,shift_size=5., splitNS=False, NorthOnly=False, SouthOnly=Fal
         for i in np.arange(np.size(left)):
             hpid[left[i]:right[i]] =  patch_healpix[i]
 
-        print 'left %i, hpid %i, all_patch_ids %i, patch_healpix %i '%(np.size(left), np.size(hpid), np.size(all_patch_ids), np.size( patch_healpix))
+        print('left %i, hpid %i, all_patch_ids %i, patch_healpix %i '%(np.size(left), np.size(hpid), np.size(all_patch_ids), np.size( patch_healpix)))
         file = open(filename,'w')
-        print >>file, "#"
-        for value in hpid:  print >>file, value
+        print("#", file=file)
+        for value in hpid:  print(value, file=file)
         file.close()
         #print j, np.size(hpid), np.size(all_patch_ids)
     
@@ -230,7 +231,7 @@ def split_obs(nside,shift_size=5., splitNS=False, NorthOnly=False, SouthOnly=Fal
     waitpop('mv hp5_star_obs.dat star_obs_hp5.dat')
 
 def waitpop(command):
-    print command
+    print(command)
     result = sb.Popen(command, shell=True).wait()
     return result
 
@@ -286,10 +287,10 @@ def patch_combine():
         patchdat[key] = patchdat[key][ord]
 
     file = open('patch_obs.dat', 'w')
-    print >>file, "%s %s %s %s %s" %("#HealID", "PatchID", "PatchMag", "PatchMagErr", "FpPatchID")
+    print("%s %s %s %s %s" %("#HealID", "PatchID", "PatchMag", "PatchMagErr", "FpPatchID"), file=file)
 
     for obj in range(0,len(patchdat['patchid'])):
-        print >>file, "%d  %d  %f  %f %d"%(patchdat['healid'][obj],patchdat['patchid'][obj], patchdat['patchmag'][obj], 0.001, 0)
+        print("%d  %d  %f  %f %d"%(patchdat['healid'][obj],patchdat['patchid'][obj], patchdat['patchmag'][obj], 0.001, 0), file=file)
 
     file.close()
 
@@ -350,7 +351,7 @@ def finalPatch(solver):
     file = open('test_bestfit_Patch.dat','w')
 
     for i in np.arange(np.size(patchmag)):
-        print >>file, "%d %f"%(patchid[i], patchmag[i])
+        print("%d %f"%(patchid[i], patchmag[i]), file=file)
 
     file.close()
 
@@ -418,10 +419,10 @@ def illum_combine():
         patchdat[key] = patchdat[key][ord]
 
     file = open('patch_obs.dat', 'w')
-    print >>file, "%s %s %s %s %s" %("#HealID", "PatchID", "PatchMag", "PatchMagErr", "FpPatchID")
+    print("%s %s %s %s %s" %("#HealID", "PatchID", "PatchMag", "PatchMagErr", "FpPatchID"), file=file)
 
     for obj in range(0,len(patchdat['patchid'])):
-        print >>file, "%d  %d  %f  %f %d"%(patchdat['healid'][obj],patchdat['patchid'][obj], patchdat['patchmag'][obj], patchdat['patchmagerr'][obj], patchdat['illumid'][obj])
+        print("%d  %d  %f  %f %d"%(patchdat['healid'][obj],patchdat['patchid'][obj], patchdat['patchmag'][obj], patchdat['patchmagerr'][obj], patchdat['illumid'][obj]), file=file)
         #print >>file, "%d  %d  %f  %f %d"%(patchdat['healid'][obj],patchdat['patchid'][obj], patchdat['patchmag'][obj], .01, patchdat['illumid'][obj])
 
     file.close()    
@@ -468,7 +469,7 @@ def finalStar_bad():
         stds[i] = stardat['starmag'][left[i]:right[i]].std()
     file = open('test_bestfit_Star.dat', 'w')
     for i in np.arange(uid.size):
-        print >>file, "%i %f"%(uid[i], mags[i])
+        print("%i %f"%(uid[i], mags[i]), file=file)
     file.close()
 #crap, that didn't work well...looks like I have to go back to the star_obs file to construct the
 
@@ -498,9 +499,9 @@ def finalStar(infile='star_obs.dat', outfile='test_bestfit_Star.dat'):
         magerr[i] = 1./np.sqrt(np.sum(1./star_obs['starerr'][left[i]:right[i]]**2))
         magstd_raw[i] = star_obs['starmag'][left[i]:right[i]].std()
     file = open(outfile, 'w')
-    print >>file, '#StarID   Mag    Err   STDEV'
+    print('#StarID   Mag    Err   STDEV', file=file)
     for i in np.arange(ustar.size):
-        print >>file, "%i %f %f %f"%(ustar[i], mag[i], magerr[i], magstd_raw[i])
+        print("%i %f %f %f"%(ustar[i], mag[i], magerr[i], magstd_raw[i]), file=file)
     file.close()
 
 
@@ -573,7 +574,7 @@ def finalStarP(infiles='h*star_obs.dat', outfile='test_bestfit_Star.dat', outsta
         #I guess I could put the print inside the loop if I was worried about memory
     file = open('test_bestfit_Star.dat','w')
     for i in np.arange(np.size(results['starid'])):
-        print >>file, '%d %f %f %f %d'%(results['starid'][i], results['mag'][i],
-                                        results['stdev'][i], results['stdev_IQR'][i],results['nobs'][i])
+        print('%d %f %f %f %d'%(results['starid'][i], results['mag'][i],
+                                        results['stdev'][i], results['stdev_IQR'][i],results['nobs'][i]), file=file)
     file.close()
 

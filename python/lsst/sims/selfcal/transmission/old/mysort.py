@@ -9,7 +9,8 @@ import pylab
 import random
 #      x= numpy.random.randint(-10,10,len(am))
 
-def csort((arr,icol)):
+def csort(xxx_todo_changeme):
+        (arr,icol) = xxx_todo_changeme
         sar = numpy.zeros(numpy.shape(arr))
         idx = numpy.argsort(arr[icol])
         for i in idx :

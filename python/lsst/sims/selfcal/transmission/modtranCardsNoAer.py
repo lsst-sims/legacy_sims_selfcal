@@ -27,6 +27,7 @@ ljones@astro.washington.edu
 
 
 """
+from __future__ import print_function
 
 import os
 import subprocess
@@ -182,7 +183,7 @@ class ModtranCards(object):
         "Pretty print the cards to the screen for debugging."""
         for run in runCards:
             for card in run:
-                print card.rstrip()
+                print(card.rstrip())
         return
 
     def writeModtranCards(self, paramValues, outfileRoot='tmp'):
@@ -266,7 +267,7 @@ class ModtranCards(object):
         # Write name of modtran .tp5 file to run, and put into mod5root.in
         # input file.
         mfile = open('mod5root.in', 'w')
-        print >>mfile, outfileRoot
+        print(outfileRoot, file=mfile)
         mfile.close()
         # Run modtran.
         errcode = subprocess.check_call(args)

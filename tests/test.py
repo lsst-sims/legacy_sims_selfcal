@@ -1,3 +1,4 @@
+from __future__ import print_function
 import os
 import pylab
 import lsst.sims.atmosphere.transmission.modtranCards as mc
@@ -14,8 +15,8 @@ def compare_line_by_line(file1='tmp.tp5', file2='ref_tmp.tp5'):
     file1 = open(file1, 'r')
     file2 = open(file2, 'r')
     for line1, line2 in zip(file1, file2):
-        print 'new', line1.strip()
-        print 'ref', line2.strip()
+        print('new', line1.strip())
+        print('ref', line2.strip())
     file1.close()
     file2.close()
     return
@@ -40,8 +41,8 @@ tests = 2
 
 for i in range(tests):
     t = time.time()
-    print "Generating atmosphere for a test case:"
-    print paramList[i]
+    print("Generating atmosphere for a test case:")
+    print(paramList[i])
     
     # Write modtran input cards
     m.writeModtranCards(paramList[i], 'tmp')
@@ -50,7 +51,7 @@ for i in range(tests):
     m.runModtran('tmp')
     
     dt, t = dtime(t)
-    print "Generating atmosphere took %f seconds." %(dt)
+    print("Generating atmosphere took %f seconds." %(dt))
 
     # Read the atmosphere back in and plot to screen. 
     atm = Bandpass()

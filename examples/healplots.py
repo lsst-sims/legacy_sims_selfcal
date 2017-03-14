@@ -5,6 +5,7 @@
 #output of self-calibration run on HEALpixels
 ###
 
+from __future__ import print_function
 import sys
 
 import numpy as np
@@ -48,13 +49,13 @@ def patchPlots(truepatchfile='patchdata.dat', bestfitpatchfile = "test_bestfit_P
     rms = patchdat['magdiff'][ord].std()
     output['Residuals RMS (mmag)'] = rms*1e3
     output['IQR_sigma (mmag)'] = so.robustSigma( patchdat['magdiff'])*1e3
-    print 'zp - fit RMS = %f, zp - fit (clipped) = %f'%(patchdat['magdiff'].std(), rms)
+    print('zp - fit RMS = %f, zp - fit (clipped) = %f'%(patchdat['magdiff'].std(), rms))
     lim = (rms*2.5)
     if lim < 0.001:
         lim = round(lim * 10000) / 10000.0
     elif lim < 0.01:
         lim = round(lim * 1000) / 1000.0
-    print "Using magnitude limits for plots of %f, %f" %(-lim, lim)
+    print("Using magnitude limits for plots of %f, %f" %(-lim, lim))
     maglim= [-lim, lim]
     #residual map
     etitle=""
@@ -120,13 +121,13 @@ def starPlots(truestarfile = "stardata.dat", bestfitstarfile = "test_bestfit_Sta
 
     outlier_clip=np.where(np.abs(stardat['magdiff']) < .05)
     rms = stardat['magdiff'][outlier_clip].std()
-    print 'true-bestfit RMS = %f, true-bestfit (clipped) = %f'%(stardat['magdiff'].std(), rms)
+    print('true-bestfit RMS = %f, true-bestfit (clipped) = %f'%(stardat['magdiff'].std(), rms))
     lim = rms*2.5
     if lim < 0.001:
         lim = round(lim * 10000) / 10000.0
     elif lim < 0.01:
         lim = round(lim * 1000) / 1000.0
-    print "Using magnitude limits for plots of %f, %f" %(-lim, lim)
+    print("Using magnitude limits for plots of %f, %f" %(-lim, lim))
     maglim= [-lim, lim]
     
     starResults['Residuals RMS (mmag)'] = stardat['magdiff'].std()*1e3
@@ -364,9 +365,9 @@ def starPlots(truestarfile = "stardata.dat", bestfitstarfile = "test_bestfit_Sta
 def printdict(dict):
     for key in dict.keys():
         if type(dict[key]) is int:
-            print str(dict[key])+'    '+ key
+            print(str(dict[key])+'    '+ key)
         else:
-            print '%4.3f'%(dict[key])+'    '+ key
+            print('%4.3f'%(dict[key])+'    '+ key)
 
 
 if __name__ == "__main__":
@@ -378,20 +379,20 @@ if __name__ == "__main__":
     
     starResults, HPResults = starPlots()
 
-    print 'Patch Stats:'
-    print '------------'
+    print('Patch Stats:')
+    print('------------')
     printdict(patchResults)
-    print '------------'
+    print('------------')
 
-    print 'Star Stats:'
-    print '------------'
+    print('Star Stats:')
+    print('------------')
     printdict(starResults)
-    print '------------'
+    print('------------')
 
-    print 'HEALpix binned results:'
-    print '------------'
+    print('HEALpix binned results:')
+    print('------------')
     printdict(HPResults)
-    print '------------'
+    print('------------')
     
 
 

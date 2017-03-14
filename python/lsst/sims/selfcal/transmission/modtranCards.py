@@ -24,6 +24,7 @@ ljones@astro.washington.edu
 
 
 """
+from __future__ import print_function
 
 import os
 import warnings
@@ -166,7 +167,7 @@ class ModtranCards:
         "Pretty print the cards to the screen for debugging."""
         for run in runCards:
             for card in run:
-                print card.rstrip()
+                print(card.rstrip())
         return
 
     def writeModtranCards(self, paramValues, outfileRoot='tmp'):
@@ -239,7 +240,7 @@ class ModtranCards:
         args = shlex.split(modtranExecutable)
         # Write name of modtran .tp5 file to run, and put into mod5root.in input file.
         file = open('mod5root.in', 'w')
-        print >>file, outfileRoot
+        print(outfileRoot, file=file)
         file.close()
         # Run modtran.
         errcode = subprocess.check_call(args)

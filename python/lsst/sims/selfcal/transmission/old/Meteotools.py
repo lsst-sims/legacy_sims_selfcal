@@ -1,3 +1,4 @@
+from __future__ import print_function
 #============================================================================
 #
 #               Library : Meteotools
@@ -53,7 +54,7 @@ def mkseg(tlims):
         while tcur < tend :
                 iupdown = -iupdown # switch current iupdown
                 #print 'iupdown = ',iupdown
-                print 'tcur = ',tcur
+                print('tcur = ',tcur)
                 idx = int( 1 + iupdown / 2. ) # idx is 0 (down) or 1 (up)
                 tsca = tlims[1][idx]
                 tlen = expovariate(1./tsca) # seg. length random expon

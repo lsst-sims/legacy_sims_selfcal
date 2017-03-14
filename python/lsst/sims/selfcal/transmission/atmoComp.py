@@ -22,6 +22,7 @@ class was originally used to generate plots for the calibration document. The fi
 are the ones practical for atmospheric transmission usage.
  
 """
+from __future__ import print_function
 
 import os
 from copy import deepcopy
@@ -165,14 +166,14 @@ class AtmoComp:
     def interpolateSecz(self, secz):
         """Generate atmospheric absorption profiles for this particular secz by linear interpolation."""
         if abs(secz - self.secz) < INTERPLIMIT:
-            print "Already have calculated atmospheric absorption profiles for this airmass (or close enough) so will use that."
+            print("Already have calculated atmospheric absorption profiles for this airmass (or close enough) so will use that.")
             return        
         # else reset current values
         self.secz = secz
         self.atmo_abs = None
         self.total_trans = None
         if self.seczToString(secz) in self.seczlist:
-            print "This is the same as one of the modtran profiles, so I'll use that."
+            print("This is the same as one of the modtran profiles, so I'll use that.")
             self.atmo_abs = deepcopy(self.atmo_templates[self.seczToString(secz)])
             self.total_trans = None
             return
@@ -209,7 +210,7 @@ class AtmoComp:
         # wavelen / atmo_templates == building blocks of atmosphere, with seczlist / atmo_ind keys
         # C = coeffsdictionary = to, t1, t2, alpha0 (for aerosol), C_mol, BP, C_O3, C_H2O  values    
         if (abs(secz - self.secz) > INTERPLIMIT):
-            print "Generating interpolated atmospheric absorption profiles for this airmass %f" %(secz)
+            print("Generating interpolated atmospheric absorption profiles for this airmass %f" %(secz))
             self.interpolateSecz(secz)
 
         BP0 = 782 # mb
@@ -258,7 +259,7 @@ class AtmoComp:
     def plotTrans(self, secz, xlim=(300, 1100), newfig=True, savefig=False, figroot='atmos'):
         """Plot atmospheric transmission for all components."""
         if (abs(secz - self.secz) > INTERPLIMIT):
-            print "Generating interpolated atmospheric absorption profiles for this airmass %f" %(secz)
+            print("Generating interpolated atmospheric absorption profiles for this airmass %f" %(secz))
             self.interpolateSecz(secz)
         if newfig:
             pylab.figure()
@@ -280,7 +281,7 @@ class AtmoComp:
     def plotTemplates(self, secz, xlim=(300, 1100), newfig=True, savefig=False, figroot='atmos'):
         """Plot atmospheric absorption templates (not scaled with C) for all components."""
         if (abs(secz - self.secz) > INTERPLIMIT):            
-            print "Generating interpolated atmospheric absorption profiles for this airmass %f" %(secz)
+            print("Generating interpolated atmospheric absorption profiles for this airmass %f" %(secz))
             self.interpolateSecz(secz)
         if newfig:
             pylab.figure()
@@ -348,12 +349,12 @@ class AtmoComp:
         if self.trans_total == None:
             raise Exception("No trans_total defined yet. Build an atmosphere first.")
         f = open(filename, 'w')
-        print >>f, "# Test atmosphere "
-        print >>f, "# Airmass = %.3f" %(self.secz)
+        print("# Test atmosphere ", file=f)
+        print("# Airmass = %.3f" %(self.secz), file=f)
         for coeff in self.C.keys():
-            print >>f, "# Coefficient: C['%s'] = %f" %(coeff, self.C[coeff])
+            print("# Coefficient: C['%s'] = %f" %(coeff, self.C[coeff]), file=f)
         for i in range(len(self.wavelen)):
-            print >>f, "%.3f  %.8f" %(self.wavelen[i], self.trans_total[i])
+            print("%.3f  %.8f" %(self.wavelen[i], self.trans_total[i]), file=f)
         f.close()
         return
 

@@ -1,3 +1,4 @@
+from __future__ import print_function
 import numpy as np
 import scipy.interpolate as interp
 
@@ -17,11 +18,11 @@ class FocalplaneThermalModel:
             self.addRaft(raftName, raftDataFile, raftOffset)
                 
     def addRaft(self, raftName, raftDataFile, raftOffset):
-        print 'adding raft %s %s %f\n' % (raftName, raftDataFile, raftOffset)
+        print('adding raft %s %s %f\n' % (raftName, raftDataFile, raftOffset))
         self.rafts[raftName] = RaftThermalModel(raftName, raftDataFile, raftOffset)
 
     def getTemp(self, raftName, detectorName, x, y):
-        if (self.rafts.has_key(raftName)):
+        if (raftName in self.rafts):
             raft = self.rafts[raftName]
             return raft.getTemp(detectorName, x, y)
         else:
@@ -50,7 +51,7 @@ class RaftThermalModel:
         Given a detectorName and (x,y) coord, return the temp
         """
  
-        if (self.detectors.has_key(detectorName)):
+        if (detectorName in self.detectors):
             return self.detectors[detectorName].getTemp(x, y)
         else:
             return None
@@ -62,7 +63,7 @@ class RaftThermalModel:
         temps = ()
         for coord in coordList:
             (detectorName, x, y) = coord
-            if (self.detectors.has_key(detectorName)):
+            if (detectorName in self.detectors):
                 temps.append(self.detectors[detectorName].getTemp(x, y))
             else:
                 temps.append(None)

@@ -1,7 +1,9 @@
+from __future__ import print_function
+from __future__ import absolute_import
 import os
 import numpy
 from scipy import interpolate, fftpack
-from PowerSpectrum import PowerSpectrum
+from .PowerSpectrum import PowerSpectrum
 from pylab import rms_flat
 
 class Clouds:    
@@ -72,7 +74,7 @@ class Clouds:
         ## correct for normalizations 
         if normfile == None:
             normfile = os.path.join(os.getenv('ATMOSPHERE_CLOUDS_DIR'), 'data/1104-batch1_im.txt')
-            print normfile
+            print(normfile)
         init_im = numpy.loadtxt(normfile)
         self.clouds = self.clouds/rms_flat(self.clouds)*rms_flat(init_im)
         ## will return an interpolation function next 

@@ -1,3 +1,4 @@
+from __future__ import print_function
 import numpy as np
 import lsst.sims.maf.db as db
 from lsst.sims.selfcal.generation.starsTools import starsProject, assignPatches
@@ -70,8 +71,8 @@ def genCatalog(visits, starsDbAddress, offsets=None, lsstFilter='r', raBlockSize
     ofile = open(obsFile, 'w')
     tfile = open(truthFile, 'w')
 
-    print >>ofile, '#PatchID, StarID, ObservedMag, MagUncertainty, Radius, HPID'
-    print >>tfile, '#StarID, TrueMag, ra, dec'
+    print('#PatchID, StarID, ObservedMag, MagUncertainty, Radius, HPID', file=ofile)
+    print('#StarID, TrueMag, ra, dec', file=tfile)
 
     # Set up connection to stars db:
     msrgbDB = db.Database(starsDbAddress, dbTables={'stars':['stars', 'id']})
@@ -128,10 +129,10 @@ def genCatalog(visits, starsDbAddress, offsets=None, lsstFilter='r', raBlockSize
                     # One side wrapped
                     else:
                         sqlwhere += 'and (ra > %f or ra < %f)'%(raMin,raMax)
-                print 'quering stars with: '+sqlwhere
+                print('quering stars with: '+sqlwhere)
                 stars = msrgbDB.tables['stars'].query_columns_Array(
                     colnames=starCols, constraint=sqlwhere)
-                print 'got %i stars'%stars.size
+                print('got %i stars'%stars.size)
                 # Add all the columns I will want here, then I only do
                 # one numpy stack per block rather than lots of stacks per visit
                 # Ugh, feels like writing fortran though...
@@ -144,8 +145,8 @@ def genCatalog(visits, starsDbAddress, offsets=None, lsstFilter='r', raBlockSize
                 newIDs = np.in1d(stars['id'], idsUsed, invert=True, assume_unique=True)
                 newIDs = np.arange(stars['id'].size)[newIDs]
                 for newID in  newIDs:
-                    print >>tfile, '%i, %f, %f, %f'%(stars['id'][newID],stars['%smag'%lsstFilter][newID],
-                                                     stars['ra'][newID], stars['decl'][newID])
+                    print('%i, %f, %f, %f'%(stars['id'][newID],stars['%smag'%lsstFilter][newID],
+                                                     stars['ra'][newID], stars['decl'][newID]), file=tfile)
 
                 idsUsed.extend(stars['id'][newIDs].tolist())
 
@@ -179,9 +180,9 @@ def genCatalog(visits, starsDbAddress, offsets=None, lsstFilter='r', raBlockSize
 
                 # patchID, starID, observed Mag, mag uncertainty, radius, healpixIDs
                 for star,obsmag,magE in zip(starsIn,obsMag,magErr):
-                    print >>ofile, "%i, %i, %f, %f, %f, %i "%( \
+                    print("%i, %i, %f, %f, %f, %i "%( \
                         star['patchID'],star['id'], obsmag, magE,
-                        star['radius'], 0) #star['hpID'])
+                        star['radius'], 0), file=ofile) #star['hpID'])
 
                 # Note the new starID's and print those to a truth file
                 # starID true mag

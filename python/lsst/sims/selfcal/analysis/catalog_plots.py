@@ -1,3 +1,4 @@
+from __future__ import print_function
 #####
 #  Lynne Jones, ljones@astro.washington.edu
 #  svn version info : $Id$
@@ -73,7 +74,7 @@ def adjust_stars_calvstrue(stardat):
     stardat['magdiff'] = stardat['magdiff'] - floatzp
     meanout = stardat['magdiff'].mean()
     rms = stardat['magdiff'].std()
-    print "Before adjustment: mean %f.  After adjustment: mean %f with stdev %f" %(meanin, meanout, rms)
+    print("Before adjustment: mean %f.  After adjustment: mean %f with stdev %f" %(meanin, meanout, rms))
     #return stardat, meanin, meanout, rms
     return stardat
     
@@ -214,9 +215,9 @@ def plot_minstars_patch(patchdat, minstars=2, subpatch=None, newfig=True):
         condition = condition & (patch['subpatch']==subpatch)
     tempx = patchdat['x'][condition]
     tempy = patchdat['y'][condition]
-    print "%f%s (%d) of the total %d patchdat have less than %f stars" \
+    print("%f%s (%d) of the total %d patchdat have less than %f stars" \
           %(float(len(tempx))/len(patchdat['nstars'])*100.0, 
-            "%s", len(tempx), len(patchdat['nstars']), minstars)
+            "%s", len(tempx), len(patchdat['nstars']), minstars))
     pyl.plot(tempx, tempy, 'k.')
     cpu.make_radec_grid(cpu.hammer_project_toxy)
     string = "Locations of patchdat with less than %d stars" %(minstars)
@@ -262,8 +263,8 @@ def adjust_patch_calvstrue(patchdat):
     patchdat['magdiff'] = patchdat['magdiff'] - floatzp
     meanout = patchdat['magdiff'].mean()
     rms = patchdat['magdiff'].std()
-    print "Before adjustment: mean %f.  After adjustment of %f, find mean %f with stdev %f" \
-          %(meanin, floatzp, meanout, rms)
+    print("Before adjustment: mean %f.  After adjustment of %f, find mean %f with stdev %f" \
+          %(meanin, floatzp, meanout, rms))
     #return stardat, meanin, meanout, rms
     return patchdat
     

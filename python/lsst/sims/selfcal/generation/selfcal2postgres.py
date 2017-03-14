@@ -1,3 +1,4 @@
+from __future__ import print_function
 #Take the output files from simSelfCalib.py and send them over to a Postgres database
 #assumes you are running the script in the directory where files are to be coppied from
 #
@@ -27,37 +28,37 @@ def fitted2db(master_table_name, index_tag='_', dbname='localhost:calsim', bestf
     os.system("perl -i -p -e 'tr/ //s;' "+bestfitpatchfile)  ##remove  any extra spaces
 
     #open the database
-    print 'opening connection'
+    print('opening connection')
     db = pg.connect(dsn = dbname)
     cursor = db.cursor ()
     cwd=os.getcwd()
 
     #Create the bestfit stars table
     cursor.execute ("DROP TABLE IF EXISTS "+bestfit_table_name)
-    print "DROP TABLE IF EXISTS "+bestfit_table_name
+    print("DROP TABLE IF EXISTS "+bestfit_table_name)
     cmd = "CREATE TABLE " + bestfit_table_name + " (StarID int, StarMagCalib real);"
-    print cmd
+    print(cmd)
     cursor.execute (cmd)
     db.commit()
 
     ##Copy the bestfit stars stuff in
     cmd = "COPY "+  bestfit_table_name + " FROM '"+cwd+'/'+bestfitfile+"' DELIMITER ' ';"
-    print cmd
+    print(cmd)
     cursor.execute (cmd)
     db.commit()
 
     #Create the bestfit patch table
     cursor.execute ("DROP TABLE IF EXISTS "+bestfit_patch_table_name)
-    print "DROP TABLE IF EXISTS "+bestfit_patch_table_name
+    print("DROP TABLE IF EXISTS "+bestfit_patch_table_name)
     cmd = "CREATE TABLE " + bestfit_patch_table_name + " (PatchID int, dmagcal real);"
-    print cmd
+    print(cmd)
     cursor.execute (cmd)
     db.commit()
 
     ##Copy the bestfit stars stuff in
     cmd = "COPY "+  bestfit_patch_table_name + " FROM '"+cwd+'/'\
           +bestfitpatchfile+"' DELIMITER ' ';"
-    print cmd
+    print(cmd)
     cursor.execute (cmd)
     db.commit()
 
@@ -71,7 +72,7 @@ def fitted2db(master_table_name, index_tag='_', dbname='localhost:calsim', bestf
     cursor.execute (cmd)
     
     db.commit()
-    print 'finished, closing connection'
+    print('finished, closing connection')
     cursor.close()
     db.close()
 
@@ -84,7 +85,7 @@ def sim2db(master_table_name, index_tag='_', dbname='localhost:calsim', masterfi
     Put them into a postgres database.  Index the tables on useful quanities (like StarID).  """
 
     #open the database
-    print 'opening connection'
+    print('opening connection')
     db = pg.connect(dsn = dbname)
     cursor = db.cursor ()
     cwd=os.getcwd()
@@ -99,14 +100,14 @@ def sim2db(master_table_name, index_tag='_', dbname='localhost:calsim', masterfi
     cursor.execute(cmd)
     cursor.execute('DROP INDEX IF EXISTS stardataid'+index_tag+' ;')
     cmd='CREATE INDEX stardataid'+index_tag+' on '+master_table_name+'_stars (StarID)'
-    print cmd
+    print(cmd)
     cursor.execute(cmd)
     db.commit()
 
     if masterfile != None:
-        print 'creating master table'
+        print('creating master table')
         cursor.execute ("DROP TABLE IF EXISTS "+master_table_name)
-        print "DROP TABLE IF EXISTS "+master_table_name
+        print("DROP TABLE IF EXISTS "+master_table_name)
         cmd = "CREATE TABLE " + master_table_name + " ( \
         VisitID   int, \
         PatchID   int,\
@@ -139,15 +140,15 @@ def sim2db(master_table_name, index_tag='_', dbname='localhost:calsim', masterfi
         dMag_kep      real\
         );"
 
-        print cmd
+        print(cmd)
         cursor.execute(cmd)
         db.commit()
 
         ##copy the masterfile into the db
         cmd = "COPY " + master_table_name + " from '"+cwd+'/' \
               + masterfile + "' WITH DELIMITER ' ' HEADER CSV;"
-        print 'Putting the big master file in the DB'
-        print cmd
+        print('Putting the big master file in the DB')
+        print(cmd)
         cursor.execute (cmd)
         db.commit()
 
@@ -177,7 +178,7 @@ def sim2db(master_table_name, index_tag='_', dbname='localhost:calsim', masterfi
 
         
     db.commit()
-    print 'finished, closing connection'
+    print('finished, closing connection')
     cursor.close()
     db.close()
 
