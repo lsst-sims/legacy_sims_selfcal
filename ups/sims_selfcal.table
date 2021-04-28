@@ -11,9 +11,7 @@ setupRequired(swig)
 envSet(MODTRAN_EXECUTABLE, ${PRODUCT_DIR}/modtran/Mod90_5.2.1.exe)
 envSet(MODTRAN_DATADIR, ${PRODUCT_DIR}/modtran/DATA/)
 
-envAppend(LD_LIBRARY_PATH, ${PRODUCT_DIR}/lib)
-envAppend(DYLD_LIBRARY_PATH, ${PRODUCT_DIR}/lib)
-envAppend(PYTHONPATH, ${PRODUCT_DIR}/python)
+envPrepend(PYTHONPATH, ${PRODUCT_DIR}/python)
 
 envSet(SELFCAL_DATA, ${PRODUCT_DIR}/data)
 
